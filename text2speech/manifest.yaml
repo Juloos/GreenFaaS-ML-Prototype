@@ -1,0 +1,42 @@
+packages:
+    demo:
+        actions:
+            text2speech:
+                function: speech/__main__.py
+                docker: onanad/action-python-v3.9:text2speech
+                web: true
+            conversion:
+                function: conversion/__main__.py
+                docker: onanad/action-python-v3.9:conversion
+                web: true
+            profanity:
+                function: profanity/__main__.py
+                docker: onanad/action-python-v3.9:profanity
+                web: true
+            censor:
+                function: censor/__main__.py
+                docker: onanad/action-python-v3.9:censor
+                web: true
+            coord:
+                function: coord/__main__.py
+                web: true
+            validation:
+                function: validation/__main__.py
+                web: true
+        sequences:
+            S1: 
+                actions: demo/text2speech
+                web: true
+            S2: 
+                actions: demo/text2speech, demo/conversion
+                web: true
+            S3: 
+                actions: demo/coord, demo/censor
+                web: true
+            S4: 
+                actions: demo/validation, demo/text2speech, demo/conversion
+                web: true
+            S5: 
+                actions: demo/validation, demo/coord, demo/censor
+                web: true
+         
