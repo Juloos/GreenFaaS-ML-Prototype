@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-IPV4="172.20.10.3"
+IPV4="172.17.0.1"
 SCHEMA="S5"
 TEXTES=("1Ko.txt" "5Ko.txt" "12Ko.txt")
 
