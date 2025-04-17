@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 cd "$(dirname "$0")"
 
@@ -19,10 +19,12 @@ for SCHEMA in "${SCHEMAS[@]}"; do
   for TEXT in "${TEXTES[@]}"; do
     echo -e "Starting $SCHEMA with $TEXT at $(date)"
     for (( i = 0; i < 101 ; i++ )); do
+      printf "Doing $i\r"
       ./bin/wsk action invoke "demo/$SCHEMA" -r \
-        --param ipv4 "$1" \
-        --param schema "$SCHEMA" \
-        --param text "$TEXT"
+        -p ipv4 "$1" \
+        -p schema "$SCHEMA" \
+        -p text "$TEXT" \
+        >/dev/null
     done
   done
 done
