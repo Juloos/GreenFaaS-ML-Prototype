@@ -1,5 +1,5 @@
 # GreenFaaS ML Prototype
-Testing whether it is viable to estimate the energy consumption of a faas workload using machine model on the initial request.
+Testing whether it is viable to estimate the energy consumption of a faas workload using machine learning model on the initial request.
 
 # Running OpenWhisk
 
