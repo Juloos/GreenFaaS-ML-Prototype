@@ -66,7 +66,7 @@ def conversion(file):
 
 def main(args):
 
-    ipv4 = args.get("ipv4", "ipv4.not.given")
+    ipv4 = args.get("ipv4", "conversion.ipv4.not.given")
 
     pull_begin = datetime.datetime.now()
     pull("speech.mp3", ipv4)

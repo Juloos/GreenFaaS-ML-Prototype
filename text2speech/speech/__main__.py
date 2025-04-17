@@ -140,7 +140,7 @@ def pollySpeech(file):
 
 def main(args):
     
-    ipv4 = args.get("ipv4", "ipv4.not.given")
+    ipv4 = args.get("ipv4", "speech.ipv4.not.given")
     text = args.get("text", "1Ko.txt")
 
     pull_begin = datetime.datetime.now()

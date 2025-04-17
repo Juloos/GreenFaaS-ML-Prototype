@@ -85,7 +85,7 @@ def extract_indexes(text, char="*"):
     
 def main(args):
 
-    ipv4 = args.get("ipv4", "ipv4.not.given")
+    ipv4 = args.get("ipv4", "profanity.ipv4.not.given")
     text = args.get("text", "1Ko.txt")
 
 

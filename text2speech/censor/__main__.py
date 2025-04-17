@@ -84,7 +84,7 @@ def censor(file):
 
 def main(args):
 
-    ipv4 = args.get("ipv4", "ipv4.not.given")
+    ipv4 = args.get("ipv4", "censor.ipv4.not.given")
 
     pull_begin = datetime.datetime.now()
     pull("speech.wav", ipv4)
