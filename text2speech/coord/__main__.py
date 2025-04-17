@@ -10,7 +10,7 @@ def start(action, args, result, lock):
     try:
         r = requests.get(apihost % "host.docker.internal", headers={"Content-Type": "application/json"}, params=args)
     except requests.exceptions.ConnectionError:
-        r = requests.get(apihost % "127.17.0.1", headers={"Content-Type": "application/json"}, params=args)
+        r = requests.get(apihost % "172.17.0.1", headers={"Content-Type": "application/json"}, params=args)
     with lock:
         result.update(r.json())  
 
