@@ -20,5 +20,6 @@ For the rest of the setup, run `setup.sh`
 `node:` `$ apt update ; yes | apt upgrade ; yes | apt install default-jre nodejs npm ; /grid5000/code/bin/g5k-setup-docker`
 
 # Credit
-- text2speech & swift_files: Donald 
+- text2speech & swift_files: Donald Onana
 - openwhisk: Apache Software Foundation
+- bin/wsk & bin/wskdeploy: Apache Software Foundation 
