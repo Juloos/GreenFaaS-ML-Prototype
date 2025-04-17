@@ -13,6 +13,8 @@ For the rest of the setup, run `setup.sh`
 # Grid5000 setup
 `frontend:` `$ git clone https://github.com/Juloos/GreenFaaS-ML-Prototype`
 
+`frontend:` `$ chmod 700 GreenFaaS-ML-Prototype/*.sh`
+
 `frontend:` `$ oarsub -I -t deploy -t monitor='wattmetre_power_watt' -l host=1,walltime=3` -> returns the reserved machine `<node>`
 
 `frontend:` `$ export NODE=<node> ; kadeploy3 ubuntu2204-min -m $NODE && ssh root@$NODE`
