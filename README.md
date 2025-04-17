@@ -13,7 +13,7 @@ For the rest of the setup, run `setup.sh`
 # Grid5000 setup
 `frontend:` `$ git clone https://github.com/Juloos/GreenFaaS-ML-Prototype`
 
-`frontend:` `$ chmod 700 GreenFaaS-ML-Prototype/*.sh`
+`frontend:` `$ chmod 700 GreenFaaS-ML-Prototype/*.sh GreenFaaS-ML-Prototype/bin/*`
 
 `frontend:` `$ oarsub -I -t deploy -t monitor='wattmetre_power_watt' -l host=1,walltime=3` -> returns the reserved machine `<node>`
 
