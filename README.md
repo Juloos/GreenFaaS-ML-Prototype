@@ -11,13 +11,15 @@ You need to install OpenStacks Swift SAIO on the local machine, or preferably on
 For the rest of the setup, run `setup.sh`
 
 # Grid5000 setup
-`fgrenoble:` `$ git clone <this_repo>`
+`frontend:` `$ git clone https://github.com/Juloos/GreenFaaS-ML-Prototype --recursive`
 
-`fgrenoble:` `$ oarsub -I -t deploy -l host=1,walltime=3,monitor='wattmetre_power_watt'` -> returns the reserved machine `<node>`
+`frontend:` `$ oarsub -I -t deploy -t monitor='wattmetre_power_watt' -l host=1,walltime=3` -> returns the reserved machine `<node>`
 
-`fgrenoble:` `$ kadeploy3 ubuntu2204-min -m <node> ; ssh root@<node>`
+`frontend:` `$ export NODE=<node> ; kadeploy3 ubuntu2204-min -m $NODE && ssh root@$NODE`
 
-`node:` `$ apt update ; yes | apt upgrade ; yes | apt install default-jre nodejs npm ; /grid5000/code/bin/g5k-setup-docker`
+`node:` `$ apt update && yes | apt upgrade && yes | apt install default-jre nodejs npm`
+
+`node:` `$ curl -fsSL https://get.docker.com -o get-docker.sh && chmod 700 get-docker.sh && ./get-docker.sh`
 
 # Credit
 - text2speech & swift_files: Donald Onana
