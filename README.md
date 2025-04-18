@@ -1,23 +1,27 @@
 # GreenFaaS ML Prototype
 Testing whether it is viable to estimate the energy consumption of a faas workload using machine learning model on the initial request.
 
-# Running OpenWhisk
+Run OpenWhisk with
 
     $ ./run_openwhisk.sh
+
+Run the demo to get energy consumption data with
+
+    $ ./run_text2speech.sh
 
 # Setup
 You need to install OpenStacks Swift SAIO on the local machine, or preferably on a distant machine with public access. You can follow the instructions given [here](https://docs.openstack.org/swift/latest/development_saio.html). This prototype uses the "test:tester" user in the "whiskcontainer" namespace, all the files that need to be uploaded to this namespace beforehand are in `swift_files/`.
 
-For the rest of the setup, run `setup.sh`
-
 # Grid5000 setup
-`frontend:` `$ git clone https://github.com/Juloos/GreenFaaS-ML-Prototype`
+Please use Lyon as your frontend site for the machine reservation.
 
-`frontend:` `$ chmod 700 GreenFaaS-ML-Prototype/*.sh GreenFaaS-ML-Prototype/bin/*`
+`flyon:` `$ git clone https://github.com/Juloos/GreenFaaS-ML-Prototype`
 
-`frontend:` `$ oarsub -I -t deploy -t monitor='wattmetre_power_watt' -l host=1,walltime=3` -> returns the reserved machine `<node>`
+`flyon:` `$ chmod 700 GreenFaaS-ML-Prototype/*.sh GreenFaaS-ML-Prototype/bin/*`
 
-`frontend:` `$ export NODE=<node> ; kadeploy3 ubuntu2204-min -m $NODE && ssh root@$NODE`
+`flyon:` `$ oarsub -I -t deploy -t monitor='wattmetre_power_watt' -l host=1,walltime=3` -> returns the reserved machine `<node>`
+
+`flyon:` `$ export NODE=<node> ; kadeploy3 ubuntu2204-min -m $NODE && ssh root@$NODE`
 
 `node:` `$ apt update && yes | apt upgrade && yes | apt install default-jre nodejs npm`
 
