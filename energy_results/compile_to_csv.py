@@ -7,7 +7,7 @@ import csv
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
-SCHEMAS=("S1", "S2", "S3")#, "S4", "S5")
+SCHEMAS=("S1", "S2", "S3", "S4", "S5")
 TEXTES=("1Ko.txt", "5Ko.txt", "12Ko.txt")
 
 if len(sys.argv) != 2:
