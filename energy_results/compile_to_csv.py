@@ -7,7 +7,7 @@ import csv
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
-SCHEMAS=("S1", "S2", "S3", "S4", "S5")
+SCHEMAS=("S1", "S2", "S3")#, "S4", "S5")
 TEXTES=("1Ko.txt", "5Ko.txt", "12Ko.txt")
 
 if len(sys.argv) != 2:
@@ -17,7 +17,7 @@ idle_watts = float(sys.argv[1])
 
 with open("all.csv", "w") as fout:
     csv_writer = csv.writer(fout)
-    csv_writer.writerow(["schema", "texte", "watth"])
+    csv_writer.writerow(["schema", "texte", "watts", "milliseconds"])
     for schema in SCHEMAS:
         for texte in TEXTES:
             with open(f"{schema}/{texte}.json", "r") as fin:
@@ -25,7 +25,6 @@ with open("all.csv", "w") as fout:
             start = datetime.datetime.fromisoformat(data[0]["timestamp"])
             end = datetime.datetime.fromisoformat(data[-1]["timestamp"])
             total = sum((float(d["value"]) - idle_watts) for d in data)
-            hours = (end - start).total_seconds() / 3600
-            watth = total / hours
-            print(f"{schema}/{texte} : {total}W / {hours}h -> {watth}W/h")
-            csv_writer.writerow([schema, texte, watth])
+            milliseconds = (end - start).total_seconds() * 1000
+            print(f"{schema}/{texte} : {total}W | {milliseconds}ms")
+            csv_writer.writerow([schema, texte, total, milliseconds])
