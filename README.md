@@ -39,7 +39,7 @@ Let the script run until it launches OpenWhisk, then stop it and exit the node.
 
 # Grid5000 deployment
 
-`flyon:` `$ oarsub -r -t deploy -t monitor='wattmetre_power_watt' -l host=3,walltime=1 "./GreenFaaS-ML-Prototype/deploy.sh"`
+`flyon:` `$ oarsub -t deploy -t monitor='wattmetre_power_watt' -l host=5,walltime=7 "./GreenFaaS-ML-Prototype/deploy.sh"`
 
 # Credit
 - text2speech & swift_files: Donald Onana

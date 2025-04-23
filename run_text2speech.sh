@@ -47,6 +47,3 @@ for SCHEMA in "${SCHEMAS[@]}"; do
       >"energy_results/$HOSTNAME/$SCHEMA/$TEXTE.json" 2>/dev/null
   done
 done
-
-echo "Done, Ctrl-C to quit"
-sleep inf
