@@ -1,0 +1,25 @@
+---
+name: openwhisk
+version: 1
+arch: x86_64
+alias: ubuntu2204-arm64-min
+description: has openwhisk and its dependencies
+author: support-staff@lists.grid5000.fr
+visibility: public
+destructive: false
+os: linux
+image:
+  file: ~/openwhisk_image.tar.zst
+  kind: tar
+  compression: zstd
+postinstalls:
+- archive: server:///grid5000/postinstalls/g5k-postinstall.tgz
+  compression: gzip
+  script: g5k-postinstall --net netplan --disk-aliases
+boot:
+  kernel: "/boot/vmlinuz"
+  initrd: "/boot/initrd.img"
+  kernel_params: modprobe.blacklist=nouveau
+filesystem: ext4
+partition_type: 131
+multipart: false
