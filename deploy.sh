@@ -31,7 +31,7 @@ echo "Deploying the demo..."
 for HOST in $HOSTS; do
   echo "  on $HOST"
   ssh root@$HOST "./GreenFaaS-ML-Prototype/run_text2speech.sh '$IPV4'" 2>/dev/null >/dev/null && \
-    scp -r root@$HOST:/root/GreenFaaS-ML-Prototype/energy_results . ; \
+    scp -r root@$HOST:/root/GreenFaaS-ML-Prototype/energy_results . && \
     touch "energy_results/${HOST}_done" &
 done
 
