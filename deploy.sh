@@ -3,9 +3,11 @@
 cd "$(dirname "$0")"
 
 HOSTS=`oarprint host | cut -d '.' -f 1 | tr -s '\n' ' '`
-echo "Deploying on $HOSTS"
 
-kadeploy3 -a openwhisk_env.yaml
+if [ -z "$1" ] || [ "$1" = "false" ]; then
+  echo "Deploying on $HOSTS"
+  kadeploy3 -a openwhisk_env.yaml
+fi
 
 echo "Updating git..."
 for HOST in $HOSTS; do
