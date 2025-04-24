@@ -27,7 +27,7 @@ The following commands will help you setup a environment file to run the energy 
 
 `node:` `$ curl -fsSL https://get.docker.com -o get-docker.sh && chmod 700 get-docker.sh && ./get-docker.sh`
 
-`node:` `$ git clone https://github.com/Juloos/GreenFaaS-ML-Prototype && chmod 700 GreenFaaS-ML-Prototype/*.sh`
+`node:` `$ git clone https://github.com/Juloos/GreenFaaS-ML-Prototype`
 
 `node:` `$ ./GreenFaaS-ML-Prototype/run_openwhisk.sh`
 
@@ -35,7 +35,7 @@ Let the script run until it launches OpenWhisk, then stop it and exit the node.
 
 `flyon:` `$ tgz-g5k -m $NODE -f ~/openwhisk_image.tar.zst`
 
-`flyon:` `$ git clone https://github.com/Juloos/GreenFaaS-ML-Prototype && chmod 700 GreenFaaS-ML-Prototype/*.sh`
+`flyon:` `$ git clone https://github.com/Juloos/GreenFaaS-ML-Prototype`
 
 # Grid5000 deployment
 
