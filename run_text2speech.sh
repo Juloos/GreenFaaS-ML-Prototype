@@ -10,8 +10,8 @@ fi
 ./bin/wsk property set --apihost "http://172.17.0.1:3233" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP"
 ./bin/wskdeploy -m text2speech/manifest.yaml
 
-SCHEMAS=("S1" "S2" "S3" "S4" "S5")
-TEXTES=(`ls swift_files | grep "Ko.txt" | tr -s '\n' ' '`)
+SCHEMAS="S1 S2 S3 S4 S5"
+TEXTES=$(ls swift_files | grep "Ko.txt" | tr -s '\n' ' ')
 echo "Using \"texte\" from : $TEXTES"
 echo "Make sure you uploaded these files in your Swift distant storage"
 
@@ -27,9 +27,9 @@ echo "Pulling from https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOST
 curl -sk "https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
   >"energy_results/$HOSTNAME/idle.json" 2>/dev/null
 
-for SCHEMA in "${SCHEMAS[@]}"; do
+for SCHEMA in $SCHEMAS; do
   mkdir -p "energy_results/$HOSTNAME/$SCHEMA/"
-  for TEXTE in "${TEXTES[@]}"; do
+  for TEXTE in $TEXTES; do
     start=$(date +%FT%T)
     echo -e "starting $SCHEMA with $TEXTE at $start"
     for (( i = 0; i < 101 ; i++ )); do
