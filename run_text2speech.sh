@@ -8,7 +8,8 @@ if [ -z "$1" ]; then
 fi
 
 ./bin/wsk property set --apihost "http://172.17.0.1:3233" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP"
-./bin/wskdeploy -m text2speech/manifest.yaml
+./bin/wskdeploy -m text2speech/manifest.yaml || 
+  { echo "Failed to deploy, make sure OpenWhisk is running."; exit 1; }
 
 SCHEMAS="S1 S2 S3 S4 S5"
 TEXTES=$(ls swift_files | grep "Ko.txt" | tr -s '\n' ' ')

@@ -22,7 +22,7 @@ for HOST in $HOSTS; do
 done
 
 echo "Waiting a bit to make sure everything is up and running..."
-sleep 30s
+sleep 1m
 
 IPV4=`cat .ipv4`
 echo "Using ipv4=$IPV4"

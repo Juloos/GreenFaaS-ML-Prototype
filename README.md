@@ -51,7 +51,7 @@ Let the script run until it launches OpenWhisk, then stop it and exit the node.
 
 `flyon:` `$ echo "Put the ip of your Swift distant machine here." >GreenFaaS-ML-Prototype/.ipv4`
 
-`flyon:` `$ oarsub -t deploy -t monitor='wattmetre_power_watt' -l host=5,walltime=7 "./GreenFaaS-ML-Prototype/deploy.sh"`
+`flyon:` `$ oarsub -t deploy -t monitor='wattmetre_power_watt' -l host=10,walltime=7 "./GreenFaaS-ML-Prototype/deploy.sh"`
 
 
 # Credit
