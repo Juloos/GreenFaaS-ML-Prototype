@@ -11,7 +11,7 @@ fi
 ./bin/wskdeploy -m text2speech/manifest.yaml
 
 SCHEMAS=("S1" "S2" "S3" "S4" "S5")
-TEXTES=`ls -l swift_files | grep "Ko.txt"`
+TEXTES=`ls swift_files | grep "Ko.txt"`
 echo "Using "texte" from : $TEXTES"
 echo "Make sure you uploaded these files in your Swift distant storage"
 
