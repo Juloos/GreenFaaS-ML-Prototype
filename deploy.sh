@@ -24,11 +24,14 @@ done
 echo "Waiting a bit to make sure everything is up and running..."
 sleep 30s
 
+IPV4=`cat .ipv4`
+echo "Using ipv4=$IPV4"
+
 echo "Deploying the demo..."
 for HOST in $HOSTS; do
   echo "  on $HOST"
-  ssh root@$HOST "./GreenFaaS-ML-Prototype/run_text2speech.sh" 2>/dev/null >/dev/null && \
-    scp -r root@$HOST:/root/GreenFaaS-ML-Prototype/energy_results/$HOST energy_results ; \
+  ssh root@$HOST "./GreenFaaS-ML-Prototype/run_text2speech.sh '$IPV4'" 2>/dev/null >/dev/null && \
+    scp -r root@$HOST:/root/GreenFaaS-ML-Prototype/energy_results . ; \
     touch "energy_results/${HOST}_done" &
 done
 
