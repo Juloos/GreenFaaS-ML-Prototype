@@ -4,7 +4,6 @@ cd "$(dirname "$0")"
 
 HOSTS=`oarprint host | cut -d '.' -f 1 | tr -s '\n' ' '`
 
-# if the first argument is not set, or if it is set to "false", deploy the environment
 if [ -z "$1" ] || [ "$1" = "false" ]; then
   echo "Deploying on $HOSTS"
   kadeploy3 -a openwhisk_env.yaml
