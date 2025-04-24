@@ -9,7 +9,7 @@ visibility: public
 destructive: false
 os: linux
 image:
-  file: ../openwhisk_image.tar.zst
+  file: ./openwhisk_image.tar.zst
   kind: tar
   compression: zstd
 postinstalls:

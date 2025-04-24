@@ -11,15 +11,22 @@ Run the demo to get energy consumption data with
 
 Wait that OpenWhisk finished building and deploying before running the demo for accurate data.
 
+
+# Prerequisites
+
+An account on Grid5000 with access to Lyon site, and a machine with public access to run OpenStack Swift SAIO's front API.
+
+
 # Setup
-You need to install OpenStacks Swift SAIO on the local machine, or preferably on a distant machine with public access. You can follow the instructions given [here](https://docs.openstack.org/swift/latest/development_saio.html). This prototype uses the "test:tester" user in the "whiskcontainer" namespace, all the files that need to be uploaded to this namespace beforehand are in `swift_files/`.
+You need to install OpenStacks Swift SAIO on a distant machine with public access. You can follow the instructions given [here](https://docs.openstack.org/swift/latest/development_saio.html). This prototype uses the "test:tester" user in the "whiskcontainer" namespace, all the files that need to be uploaded to this namespace beforehand are in `swift_files/`.
+
 
 # Grid5000 setup
 Please use Lyon as your frontend site for the machine reservation.
 
-The following commands will help you setup a environment file to run the energy gathering data on multiple machines later on.
+The following commands will help you setup an environment file to run the energy gathering data on multiple machines later on.
 
-`flyon:` `$ oarsub -I -t deploy -l host=1,walltime=1` -> returns the reserved machine `<node>`
+`flyon:` `$ oarsub -I -t deploy -l host=1,walltime=1`
 
 `flyon:` `$ export NODE=$(oarprint host) && kadeploy3 ubuntu2204-min && ssh root@$NODE`
 
@@ -33,13 +40,15 @@ The following commands will help you setup a environment file to run the energy 
 
 Let the script run until it launches OpenWhisk, then stop it and exit the node.
 
-`flyon:` `$ tgz-g5k -m $NODE -f ~/openwhisk_image.tar.zst`
+`flyon:` `$ git clone https://github.com/Juloos/GreenFaaS-ML-Prototype && cd GreenFaaS-ML-Prototype`
 
-`flyon:` `$ git clone https://github.com/Juloos/GreenFaaS-ML-Prototype`
+`flyon:` `$ tgz-g5k -m $NODE -f openwhisk_image.tar.zst`
+
 
 # Grid5000 deployment
 
 `flyon:` `$ oarsub -t deploy -t monitor='wattmetre_power_watt' -l host=5,walltime=7 "./GreenFaaS-ML-Prototype/deploy.sh"`
+
 
 # Credit
 - text2speech & swift_files: Donald Onana
