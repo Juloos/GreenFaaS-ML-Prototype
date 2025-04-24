@@ -11,13 +11,15 @@ Run the demo to get energy consumption data with
 
 Wait that OpenWhisk finished building and deploying before running the demo for accurate data.
 
+You can also decide to run the tests on multiple machines automatically on Grid5000 as described below.
+
 
 # Prerequisites
 
 An account on Grid5000 with access to Lyon site, and a machine with public access to run OpenStack Swift SAIO's front API.
 
 
-# Setup
+# General setup
 You need to install OpenStacks Swift SAIO on a distant machine with public access. You can follow the instructions given [here](https://docs.openstack.org/swift/latest/development_saio.html). This prototype uses the "test:tester" user in the "whiskcontainer" namespace, all the files that need to be uploaded to this namespace beforehand are in `swift_files/`.
 
 
