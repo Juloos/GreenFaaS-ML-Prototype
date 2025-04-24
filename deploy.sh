@@ -2,7 +2,7 @@
 
 cd "$(dirname "$0")"
 
-HOSTS=`oarprint host | tr -s '\n' ' '`
+HOSTS=`oarprint host | cut -d '.' -f 1 | tr -s '\n' ' '`
 echo "Deploying on $HOSTS"
 
 kadeploy3 -a openwhisk_env.yaml
@@ -19,5 +19,16 @@ sleep 30s
 echo "Deploying the demo..."
 for HOST in $HOSTS; do
   echo "  on $HOST"
-  ssh root@$HOST "nohup ./GreenFaaS-ML-Prototype/run_text2speech.sh </dev/null &" 2>/dev/null >/dev/null && scp -r root@$HOST:/root/GreenFaaS-ML-Prototype/energy_results energy_results &
+  ssh root@$HOST "nohup ./GreenFaaS-ML-Prototype/run_text2speech.sh </dev/null &" 2>/dev/null >/dev/null && \
+    scp -r root@$HOST:/root/GreenFaaS-ML-Prototype/energy_results energy_results ; \
+    touch "energy_results/${HOST}_done" &
+done
+
+echo "Waiting for all hosts to finish..."
+for HOST in $HOSTS; do
+  while [ ! -f "energy_results/${HOST}_done" ]; do
+    sleep 10s
+  done
+  echo "  on $HOST: done"
+  rm "energy_results/${HOST}_done"
 done
