@@ -15,12 +15,11 @@ SCHEMAS="S1 S2 S3 S4 S5"
 TEXTES=$(ls swift_files | grep "Ko.txt" | tr -s '\n' ' ')
 echo "Using \"texte\" from : $TEXTES"
 
-echo "Uploading them to host's container..."
-python3 ./swift_files/upload.py $1
-
-
 HOSTNAME=$(hostname)
 mkdir -p "energy_results/$HOSTNAME/"
+
+echo "Uploading swift files to host's container..."
+swift upload "${HOSTNAME}_whiskcontainer" swift_files/* -A "http://$1:8080/auth/v1.0" -U "test:tester" -K "testing"
 
 echo Waiting 15m...
 start=$(date +%FT%T)
