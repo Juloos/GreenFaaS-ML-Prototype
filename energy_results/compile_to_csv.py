@@ -1,30 +1,40 @@
-import sys
 import os
 import json
 import datetime
 import csv
+import glob
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
-SCHEMAS=("S1", "S2", "S3", "S4", "S5")
-TEXTES=("1Ko.txt", "5Ko.txt", "12Ko.txt")
+HOSTS = tuple(hostname.removesuffix('/') for hostname in glob.glob("*/"))
+SCHEMAS = ("S1", "S2", "S3", "S4", "S5")
+TEXTES = tuple(set(os.path.basename(filename).removesuffix(".json") for filename in glob.glob("../swift_files/*Ko.txt")))
 
-if len(sys.argv) != 2:
-    print(f"Usage: python3 {sys.argv[0]} <idle_watts>")
-    sys.exit(1)
-idle_watts = float(sys.argv[1])
+
+idle_watts_of = dict()
+for hostname in HOSTS:
+    with open("%s/idle.json" % hostname, "r") as f:
+        data = json.load(f)
+    idle_watts_of[hostname] = sum(float(d["value"]) for d in data) / len(data)
 
 with open("all.csv", "w") as fout:
     csv_writer = csv.writer(fout)
     csv_writer.writerow(["schema", "texte", "watts", "milliseconds"])
     for schema in SCHEMAS:
         for texte in TEXTES:
-            with open(f"{schema}/{texte}.json", "r") as fin:
-                data = json.load(fin)
-            start = datetime.datetime.fromisoformat(data[0]["timestamp"])
-            end = datetime.datetime.fromisoformat(data[-1]["timestamp"])
-            total = sum((float(d["value"]) - idle_watts) for d in data)
-            milliseconds = (end - start).total_seconds() * 1000
-            print(f"{schema}/{texte} : {total}W | {milliseconds}ms")
+            total = 0
+            milliseconds = 0
+            for hostname in HOSTS:
+                with open("%s/%s/%s.json" % (hostname, schema, texte), "r") as fin:
+                    data = json.load(fin)
+                start = datetime.datetime.strptime(data[0]["timestamp"], "%Y-%m-%dT%H:%M:%S.%f%z")
+                end = datetime.datetime.strptime(data[-1]["timestamp"], "%Y-%m-%dT%H:%M:%S.%f%z")
+                host_total = sum((float(d["value"]) - idle_watts_of[hostname]) for d in data)
+                host_milliseconds = (end - start).total_seconds() * 1000
+                print(f"{hostname}/{schema}/{texte} : {host_total}W | {host_milliseconds}ms")
+                total += host_total
+                milliseconds += host_milliseconds
+            total = total / len(HOSTS)
+            milliseconds = milliseconds / len(HOSTS)
             csv_writer.writerow([schema, texte, total, milliseconds])
