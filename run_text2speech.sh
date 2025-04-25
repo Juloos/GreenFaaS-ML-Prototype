@@ -48,3 +48,5 @@ for SCHEMA in $SCHEMAS; do
       >"energy_results/$HOSTNAME/$SCHEMA/$TEXTE.json" 2>/dev/null
   done
 done
+
+swift delete "${HOSTNAME}_whiskcontainer" -A "http://$1:8080/auth/v1.0" -U "test:tester" -K "testing"
