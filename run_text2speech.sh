@@ -19,7 +19,7 @@ HOSTNAME=$(hostname)
 mkdir -p "energy_results/$HOSTNAME/"
 
 echo "Uploading swift files to host's container..."
-swift upload "${HOSTNAME}_whiskcontainer" swift_files/* -A "http://$1:8080/auth/v1.0" -U "test:tester" -K "testing"
+swift upload "${HOSTNAME}_whiskcontainer" swift_files --object-name "." -A "http://$1:8080/auth/v1.0" -U "test:tester" -K "testing"
 
 echo Waiting 15m...
 start=$(date +%FT%T)
