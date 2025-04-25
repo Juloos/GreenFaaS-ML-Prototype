@@ -20,7 +20,7 @@ An account on Grid5000 with access to Lyon site, and a machine with public acces
 
 
 # General setup
-You need to install OpenStacks Swift SAIO on a distant machine with public access. You can follow the instructions given [here](https://docs.openstack.org/swift/latest/development_saio.html). This prototype uses the "test:tester" user in the "whiskcontainer" namespace, all the files that need to be uploaded to this namespace beforehand are in `swift_files/`.
+You need to install OpenStacks Swift SAIO on a distant machine with public access. You can follow the instructions given [here](https://docs.openstack.org/swift/latest/development_saio.html). This prototype uses the "test:tester" user and the "$HOSTNAME_whiskcontainer" namespaces for each host, all the files are automatically uploaded to the namespaces beforehand from `swift_files/`.
 
 
 # Grid5000 setup
@@ -32,7 +32,7 @@ The following commands will help you setup an environment file to run the energy
 
 `flyon:` `$ export NODE=$(oarprint host) && kadeploy3 ubuntu2204-min && ssh root@$NODE`
 
-`node:` `$ apt update && yes | apt upgrade && yes | apt install default-jre nodejs npm`
+`node:` `$ f() { apt update -y && apt upgrade -y && apt install default-jre nodejs npm python3-swiftclient; }; DEBIAN_FRONTEND=noninteractive f`
 
 `node:` `$ curl -fsSL https://get.docker.com -o get-docker.sh && chmod 700 get-docker.sh && ./get-docker.sh`
 

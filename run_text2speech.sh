@@ -14,7 +14,9 @@ fi
 SCHEMAS="S1 S2 S3 S4 S5"
 TEXTES=$(ls swift_files | grep "Ko.txt" | tr -s '\n' ' ')
 echo "Using \"texte\" from : $TEXTES"
-echo "Make sure you uploaded these files in your Swift distant storage"
+
+echo "Uploading them to host's container..."
+python3 ./swift_files/upload.py $1
 
 
 HOSTNAME=$(hostname)

@@ -4,6 +4,7 @@ import json
 import wave
 import numpy as np
 import datetime
+import socket
 
 
 def push(obj, ipv4):
@@ -19,7 +20,7 @@ def push(obj, ipv4):
     	key=password,
     	auth_version='1'
 	)
-    container = 'whiskcontainer'
+    container = '%s_whiskcontainer' % socket.gethostname()
  
     with open(obj, 'rb') as f:
         conn.put_object(container, obj, contents=f.read())
@@ -41,7 +42,7 @@ def pull(obj, ipv4):
     	key=password,
     	auth_version='1'
 	)
-    container = 'whiskcontainer'
+    container = '%s_whiskcontainer' % socket.gethostname()
 
     file = conn.get_object(container, obj)
     with open(out, 'wb') as f:
