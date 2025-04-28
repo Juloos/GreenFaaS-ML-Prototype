@@ -40,6 +40,7 @@ for SCHEMA in $SCHEMAS; do
         -p ipv4 "$1" \
         -p schema "$SCHEMA" \
         -p text "$TEXTE" \
+        -p hostname "$HOSTNAME" \
         >/dev/null
     done
     end=$(date +%FT%T)
@@ -49,4 +50,5 @@ for SCHEMA in $SCHEMAS; do
   done
 done
 
+echo "Cleaning up swift files from host's container..."
 swift delete "${HOSTNAME}_whiskcontainer" -A "http://$1:8080/auth/v1.0" -U "test:tester" -K "testing"

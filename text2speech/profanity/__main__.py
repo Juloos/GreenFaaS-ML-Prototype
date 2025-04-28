@@ -2,10 +2,9 @@ from profanity import profanity
 import swiftclient
 import json
 import datetime
-import socket
 
 
-def pull(obj, ipv4):
+def pull(obj, ipv4, hostname):
   
     # Swift identifiant
     auth_url = f'http://{ipv4}:8080/auth/v1.0'
@@ -21,7 +20,7 @@ def pull(obj, ipv4):
     	key=password,
     	auth_version='1'
 	)
-    container = '%s_whiskcontainer' % socket.gethostname()
+    container = '%s_whiskcontainer' % hostname
 
     file = conn.get_object(container, obj)
     with open(out, 'wb') as f:
@@ -30,7 +29,7 @@ def pull(obj, ipv4):
     return ("Ok")
 
 
-def push(obj, ipv4):
+def push(obj, ipv4, hostname):
 
     # Swift identifiant
     auth_url = f'http://{ipv4}:8080/auth/v1.0'
@@ -45,7 +44,7 @@ def push(obj, ipv4):
     	auth_version='1'
 	)
 
-    container = '%s_whiskcontainer' % socket.gethostname()
+    container = '%s_whiskcontainer' % hostname
  
     with open(obj, 'rb') as f:
         conn.put_object(container, obj, contents=f.read())
@@ -87,11 +86,12 @@ def extract_indexes(text, char="*"):
 def main(args):
 
     ipv4 = args.get("ipv4", "profanity.ipv4.not.given")
-    text = args.get("text", "1Ko.txt")
+    text = args.get("text", "profanity.text.not.given")
+    hostname = args.get("hostname", "profanity.hostname.not.given")
 
 
     pull_begin = datetime.datetime.now()
-    pull(text, ipv4)
+    pull(text, ipv4, hostname)
     pull_end = datetime.datetime.now()
 
     process_begin = datetime.datetime.now()
@@ -99,7 +99,7 @@ def main(args):
     process_end = datetime.datetime.now()
 
     push_begin = datetime.datetime.now()
-    push(resultfile, ipv4)
+    push(resultfile, ipv4, hostname)
     push_end = datetime.datetime.now()
 
 
