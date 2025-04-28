@@ -4,10 +4,10 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from random import randint
 
-SCHEMA, TEXTE, WATTS, MS = range(4)
+SCHEMA, TEXT, WATTS, MS = range(4)
 
 step = 10000  # classes are intervals of size <step> watts
-X = [(row[SCHEMA], row[TEXTE]) for row in DATA]
+X = [(row[SCHEMA], row[TEXT]) for row in DATA]
 Y = [int(row[WATTS] // step) for row in DATA]
 
 print("X : " + str(X))

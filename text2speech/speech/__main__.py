@@ -171,6 +171,6 @@ def main(args):
          "hostname" : hostname
         }
     
-    return  {"body":response, "ipv4" : ipv4}
+    return  {"body": response, "ipv4": ipv4, "text": text, "hostname": hostname}
     
 

@@ -12,8 +12,8 @@ fi
   { echo "Failed to deploy, make sure OpenWhisk is running."; exit 1; }
 
 SCHEMAS="S1 S2 S3 S4 S5"
-TEXTES=$(ls swift_files | grep "Ko.txt" | tr -s '\n' ' ')
-echo "Using \"texte\" from : $TEXTES"
+TEXTS=$(ls swift_files | grep "Ko.txt" | tr -s '\n' ' ')
+echo "Using \"text\" from : $TEXTS"
 
 HOSTNAME=$(hostname)
 mkdir -p "energy_results/$HOSTNAME/"
@@ -31,22 +31,22 @@ curl -sk "https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metr
 
 for SCHEMA in $SCHEMAS; do
   mkdir -p "energy_results/$HOSTNAME/$SCHEMA/"
-  for TEXTE in $TEXTES; do
+  for TEXT in $TEXTS; do
     start=$(date +%FT%T)
-    echo -e "starting $SCHEMA with $TEXTE at $start"
+    echo -e "starting $SCHEMA with $TEXT at $start"
     for (( i = 0; i < 101 ; i++ )); do
       printf "Doing $i\r"
       ./bin/wsk action invoke "demo/$SCHEMA" -r \
         -p ipv4 "$1" \
         -p schema "$SCHEMA" \
-        -p text "$TEXTE" \
+        -p text "$TEXT" \
         -p hostname "$HOSTNAME" \
         >/dev/null
     done
     end=$(date +%FT%T)
     echo "Pulling from https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
     curl -sk "https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
-      >"energy_results/$HOSTNAME/$SCHEMA/$TEXTE.json" 2>/dev/null
+      >"energy_results/$HOSTNAME/$SCHEMA/$TEXT.json" 2>/dev/null
   done
 done
 

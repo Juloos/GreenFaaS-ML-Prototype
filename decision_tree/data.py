@@ -15,10 +15,10 @@ with open("../energy_results/all.csv", "r") as f:
             continue
         schema = int(row[0].removeprefix('S'))
         schemas.add(schema)
-        texte = int(row[1].removesuffix("Ko.txt"))  # Should be done better in prod, with file transfer detection for example
+        text = int(row[1].removesuffix("Ko.txt"))  # Should be done better in prod, with file transfer detection for example
         watts = float(row[2])
         milliseconds = float(row[3])
-        DATA.append((schema, texte, watts, milliseconds))
+        DATA.append((schema, text, watts, milliseconds))
 
 shuffled_schemas = list(schemas)
 shuffle(shuffled_schemas)
