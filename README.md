@@ -20,7 +20,7 @@ An account on Grid5000 with access to Lyon site, and a machine with public acces
 
 
 # General setup
-You need to install OpenStacks Swift SAIO on a distant machine with public access. You can follow the instructions given [here](https://docs.openstack.org/swift/latest/development_saio.html). This prototype uses the "test:tester" user and the "$HOSTNAME_whiskcontainer" namespaces for each host, all the files are automatically uploaded to the namespaces beforehand from `swift_files/`.
+You need to install OpenStacks Swift SAIO on a distant machine with public access. You can follow the instructions given [here](https://docs.openstack.org/swift/latest/development_saio.html). This prototype uses the "test:tester" user and the "$HOSTNAME_whiskcontainer" namespaces for each host, all the files are automatically uploaded to the namespaces beforehand from `swift_files/`. Note that you will probably need to allocate more than the default 1Go to Swift's file system if you want to deploy the demo in multiple machines.
 
 
 # Grid5000 setup
