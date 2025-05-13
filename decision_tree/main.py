@@ -1,4 +1,4 @@
-from data import DATA, SORTSCHEMA_DATA, plot_domain
+from data import DATAS, SORTSCHEMA_DATAS, plot_domain
 
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.tree import DecisionTreeClassifier, DecisionTreeRegressor
@@ -14,7 +14,7 @@ fitsNumber = 1000  # Number of fits to do
 n_estimators = 100  # Number of trees in the forest
 step = 1  # classes are intervals of size <step> watts, not useful for regression (set to 1)
 
-data = SORTSCHEMA_DATA
+data = SORTSCHEMA_DATAS[0]
 X = [(row[SCHEMA], row[TEXT]) for row in data]
 Y = [int(row[WATTS] // step) for row in data]
 
