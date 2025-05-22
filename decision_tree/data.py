@@ -1,16 +1,18 @@
 import csv
 import os
-from random import shuffle
+
 from typing import List, Tuple
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
-FROM_FILES = ["all-2.csv", "all-10.csv"]
-DATAS = [list()] * len(FROM_FILES)
-SORTSCHEMA_DATAS = [list()] * len(FROM_FILES)
+FROM_FILES = ["all-2.csv", "all-10.csv", "all-2-small.csv"]
+DATAS = list()
+SORTSCHEMA_DATAS = list()
 
 for i in range(len(FROM_FILES)):
+    SORTSCHEMA_DATAS.append(list())
+    DATAS.append(list())
     schemas = set()
     with open(f"../energy_results/{FROM_FILES[i]}", "r") as f:
         reader = csv.reader(f)
@@ -46,5 +48,6 @@ if __name__ == "__main__":
     ax.set_ylabel("Text KB")
     ax.set_zlabel("Watts")
     plot_domain(ax, [(row[0], row[1], row[2]) for row in SORTSCHEMA_DATAS[0]], "red")
-    plot_domain(ax, [(row[0], row[1], row[2]) for row in SORTSCHEMA_DATAS[1]], "orange")
+    # plot_domain(ax, [(row[0], row[1], row[2]) for row in SORTSCHEMA_DATAS[1]], "orange")
+    plot_domain(ax, [(row[0], row[1], row[2]) for row in SORTSCHEMA_DATAS[2]], "orange")
     plt.show()
