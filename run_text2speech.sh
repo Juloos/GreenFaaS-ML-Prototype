@@ -3,8 +3,16 @@
 cd "$(dirname "$0")"
 
 if [ -z "$1" ]; then
-  echo "Usage: $0 <ipv4>"
+  echo "Usage: $0 <ipv4> [<iterations>]"
   exit 1
+else
+  IPV4=$1
+fi
+
+if [ -z "$2" ]; then
+  ITERATIONS=100
+else
+  ITERATIONS=$2
 fi
 
 ./bin/wsk property set --apihost "http://172.17.0.1:3233" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP"
@@ -34,10 +42,10 @@ for SCHEMA in $SCHEMAS; do
   for TEXT in $TEXTS; do
     start=$(date +%FT%T)
     echo -e "starting $SCHEMA with $TEXT at $start"
-    for (( i = 0; i < 101 ; i++ )); do
+    for (( i = -1; i < $ITERATIONS ; i++ )); do
       printf "Doing $i\r"
       ./bin/wsk action invoke "demo/$SCHEMA" -r \
-        -p ipv4 "$1" \
+        -p ipv4 "$IPV4" \
         -p schema "$SCHEMA" \
         -p text "$TEXT" \
         -p hostname "$HOSTNAME" \
