@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 SCHEMA, TEXT, WATTS, MS = range(4)
 
-setseed = None  # Replace with your seed for reproducibility
+setseed = 10  # Replace with your seed for reproducibility
 fitsNumber = 1000  # Number of fits to do
 n_estimators = 100  # Number of trees in the forest
 step = 1  # classes are intervals of size <step> watts, not useful for regression (set to 1)
@@ -22,22 +22,39 @@ Y = [int(row[WATTS] // step) for row in data]
 # print("Y : " + str(Y))
 
 def show_decitree_data(decitree, xTrain, xTest):
-    predictions = decitree.predict(xTest)
+    ALL10DATA = list()
+    for _ in range(5):
+        ALL10DATA.append(list())
+    for row in SORTSCHEMA_DATAS[1]:
+        ALL10DATA[row[0] - 1].append(row)
+    # bar plot of watts per schema
+    fig, ax = plt.subplots(1, 3, figsize=(15, 4))
+    paths = [3, 1, 4]
+    for i in range(3):
+        ax[i].set_xlabel("Text size")
+        ax[i].set_title("Execution path %d" % (i + 1))
+        ax[i].set_ylim(0, 2_000_000)
+        ax[i].bar([str(row[1]) + "KB" for row in ALL10DATA[paths[i] - 1]], [row[2] for row in ALL10DATA[paths[i] - 1]], color="limegreen", label="Real Watts")
+        ax[i].plot([str(row[1]) + "KB" for row in ALL10DATA[paths[i] - 1]], [decitree.predict([row[:2]])[0] for row in ALL10DATA[paths[i] - 1]], color="red", label="Predicted Watts")
+        ax[i].legend()
+
+
+    # predictions = decitree.predict(xTest)
 
     # Show the difference between predicted and real values
-    fig = plt.figure()
-    ax = fig.add_subplot(projection='3d')
-    ax.set_xlabel("Schema")
-    ax.set_ylabel("Text KB")
-    ax.set_zlabel(("Watts Interval (%d)" % step) if step > 1 else "Watts")
-    plot_domain(ax, [(row[SCHEMA], row[TEXT], int(row[WATTS] // step)) for row in data], "red")
-    plot_domain(ax, [(*row, decitree.predict([row])[0]) for row in (xTrain)], "yellow")
-    plot_domain(ax, [(*row, y) for row, y in zip(xTest, predictions)], "deepskyblue")
+    # fig = plt.figure()
+    # ax = fig.add_subplot(projection='3d')
+    # ax.set_xlabel("Schema")
+    # ax.set_ylabel("Text KB")
+    # ax.set_zlabel(("Watts Interval (%d)" % step) if step > 1 else "Watts")
+    # plot_domain(ax, [(row[SCHEMA], row[TEXT], int(row[WATTS] // step)) for row in data], "red")
+    # plot_domain(ax, [(*row, decitree.predict([row])[0]) for row in (xTrain)], "yellow")
+    # plot_domain(ax, [(*row, y) for row, y in zip(xTest, predictions)], "deepskyblue")
     plt.show()
 
     # Show the decision tree's parameters
-    tree.plot_tree(decitree)
-    plt.savefig("tree.png", dpi=500)
+    # tree.plot_tree(decitree)
+    # plt.savefig("tree.png", dpi=500)
 
 min_score, max_score = 1, 0
 min_seed, max_seed = 0, 0
