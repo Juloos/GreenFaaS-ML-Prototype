@@ -11,4 +11,4 @@ cat core/standalone/src/main/resources/standalone.conf | \
          s/limits-actions-invokes-perMinute = 60/limits-actions-invokes-perMinute = 999999/ ;
          s/limits-actions-invokes-concurrent = 30/limits-actions-invokes-concurrent = 999999/" \
     >standalone.conf.modified
-./gradlew core:standalone:bootRun --args='-c standalone.conf.modified'
+./gradlew core:standalone:bootRun --args="-c $(realpath standalone.conf.modified)"
