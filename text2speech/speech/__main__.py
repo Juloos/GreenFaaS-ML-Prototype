@@ -47,13 +47,12 @@ def push(obj, ipv4):
 
 
 def espeakSpeech(file, ttsid):
-
-    with open(file, "r") as f:
-            message = f.read()
-    command = f'espeak-ng "{message}" --stdout | ffmpeg -y -i pipe: {ttsid}.wav -loglevel quiet'
+    with open(file, 'r') as f:
+        textSize = len(f.read())
+    command = f'espeak-ng -f {file} --stdout | ffmpeg -y -i pipe: {ttsid}.wav -loglevel quiet'
     # Run the command in the shell
     subprocess.run(command, shell=True, check=True)
-    return f"{ttsid}.wav", message
+    return f"{ttsid}.wav", textSize
  
 
 def main(args):
@@ -67,7 +66,7 @@ def main(args):
     pull_end = datetime.datetime.now()
     
     process_begin = datetime.datetime.now()
-    result, message = espeakSpeech(text, ttsid)
+    result, textSize = espeakSpeech(text, ttsid)
     process_end = datetime.datetime.now()
 
     push_begin = datetime.datetime.now()
@@ -75,7 +74,7 @@ def main(args):
     push_end = datetime.datetime.now()
 
     response = {
-         "textSize" : len(message),
+         "textSize" : textSize,
          "fileSize" : os.path.getsize(result),
          "schema" : args.get("schema"),
          "text2speech" : {
