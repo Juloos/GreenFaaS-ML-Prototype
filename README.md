@@ -32,11 +32,11 @@ The following commands will help you setup an environment file to run the energy
 
 `flyon:` `$ export NODE=$(oarprint host) && kadeploy3 ubuntu2204-min && ssh root@$NODE`
 
-`node:` `$ f() { apt update -y && apt upgrade -y && apt install default-jre nodejs npm python3-swiftclient; }; DEBIAN_FRONTEND=noninteractive f`
+`node:` `$ f() { apt update -y && apt upgrade -y && apt install -y default-jre nodejs npm python3-swiftclient; }; DEBIAN_FRONTEND=noninteractive f`
 
 `node:` `$ curl -fsSL https://get.docker.com -o get-docker.sh && chmod 700 get-docker.sh && ./get-docker.sh`
 
-`node:` `$ git clone https://github.com/Juloos/GreenFaaS-ML-Prototype`
+`node:` `$ git clone https://github.com/Juloos/GreenFaaS-ML-Prototype --branch "NoML-Energy-Monitoring"`
 
 `node:` `$ ./GreenFaaS-ML-Prototype/run_openwhisk.sh`
 
