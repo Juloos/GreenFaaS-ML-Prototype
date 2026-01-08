@@ -26,7 +26,7 @@ fi
   { echo "Failed to deploy, make sure OpenWhisk is running."; exit 1; }
 
 SCHEMAS="S1 S3 S4 S5"
-TEXTS=$(ls swift_files | grep ".txt" | tr -s '\n' ' ')
+TEXTS=$(ls swift_files | grep -E "^.*\.txt$" | tr -s '\n' ' ')
 echo "Using \"text\" from : $TEXTS"
 
 HOSTNAME=$(hostname)
@@ -35,9 +35,9 @@ mkdir -p "energy_results/$HOSTNAME/"
 echo "Uploading swift files to host's container..." # Redundant but just in case, also there should be only few hosts running this script
 swift upload "whiskcontainer" swift_files --object-name "." --skip-identical -A "http://$1:8080/auth/v1.0" -U "test:tester" -K "testing"
 
-echo Waiting 15m...
+echo Waiting 1m...
 start=$(date +%FT%T)
-sleep 15m
+sleep 1m
 end=$(date +%FT%T)
 echo "Pulling from https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
 curl -sk "https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
