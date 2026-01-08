@@ -6,7 +6,7 @@ import numpy as np
 import datetime
 
 
-def push(obj, ipv4, hostname):
+def push(obj, ipv4):
 
     # Swift identifiant
     auth_url = f'http://{ipv4}:8080/auth/v1.0'
@@ -19,15 +19,14 @@ def push(obj, ipv4, hostname):
     	key=password,
     	auth_version='1'
 	)
-    container = '%s_whiskcontainer' % hostname
  
     with open(obj, 'rb') as f:
-        conn.put_object(container, obj, contents=f.read())
+        conn.put_object("whiskcontainer", obj, contents=f.read())
  
     return ("Ok")
 
 
-def pull(obj, ipv4, hostname):
+def pull(obj, ipv4):
   
     # Swift identifiant
     auth_url = f'http://{ipv4}:8080/auth/v1.0'
@@ -41,15 +40,14 @@ def pull(obj, ipv4, hostname):
     	key=password,
     	auth_version='1'
 	)
-    container = '%s_whiskcontainer' % hostname
 
-    file = conn.get_object(container, obj)
+    file = conn.get_object("whiskcontainer", obj)
     with open(out, 'wb') as f:
         f.write(file[1])
 
     return ("Ok")
 
-def censor(file):
+def censor(file, ttsid):
     # Open the input WAV file
     with wave.open(file, 'rb') as wav_file:
         params = wav_file.getparams()
@@ -61,7 +59,7 @@ def censor(file):
     samples = samples.copy()
 
     # Load the index JSON data
-    with open("index.json", 'r') as f:
+    with open(f"{ttsid}.json", 'r') as f:
         indexes = json.load(f)
 
     # Calculate total number of samples
@@ -85,19 +83,19 @@ def censor(file):
 def main(args):
 
     ipv4 = args.get("ipv4", "censor.ipv4.not.given")
-    hostname = args.get("hostname", "censor.hostname.not.given")
+    ttsid = args.get("ttsid", "censor.ttsid.not.given")
 
     pull_begin = datetime.datetime.now()
-    pull("speech.wav", ipv4, hostname)
-    pull("index.json", ipv4, hostname)
+    pull(f"{ttsid}.wav", ipv4)
+    pull(f"{ttsid}.json", ipv4)
     pull_end = datetime.datetime.now()
     
     process_begin = datetime.datetime.now()
-    result = censor("speech.wav")
+    result = censor(f"{ttsid}.wav", ttsid)
     process_end = datetime.datetime.now()
 
     push_begin = datetime.datetime.now()
-    push(result, ipv4, hostname)
+    push(result, ipv4)
     push_end = datetime.datetime.now()
 
     args["WavCensoredSize"] = os.path.getsize("censored.wav")
@@ -107,4 +105,4 @@ def main(args):
             "push" : (push_end - push_begin) / datetime.timedelta(seconds=1)
         }
 
-    return  {"body" : args}
+    return  {"body" : args, "ipv4": ipv4, "ttsid": ttsid}

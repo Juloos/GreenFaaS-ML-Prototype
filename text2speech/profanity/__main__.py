@@ -4,7 +4,7 @@ import json
 import datetime
 
 
-def pull(obj, ipv4, hostname):
+def pull(obj, ipv4):
   
     # Swift identifiant
     auth_url = f'http://{ipv4}:8080/auth/v1.0'
@@ -20,16 +20,15 @@ def pull(obj, ipv4, hostname):
     	key=password,
     	auth_version='1'
 	)
-    container = '%s_whiskcontainer' % hostname
 
-    file = conn.get_object(container, obj)
+    file = conn.get_object("whiskcontainer", obj)
     with open(out, 'wb') as f:
         f.write(file[1])
 
     return ("Ok")
 
 
-def push(obj, ipv4, hostname):
+def push(obj, ipv4):
 
     # Swift identifiant
     auth_url = f'http://{ipv4}:8080/auth/v1.0'
@@ -44,24 +43,22 @@ def push(obj, ipv4, hostname):
     	auth_version='1'
 	)
 
-    container = '%s_whiskcontainer' % hostname
- 
     with open(obj, 'rb') as f:
-        conn.put_object(container, obj, contents=f.read())
- 
+        conn.put_object("whiskcontainer", obj, contents=f.read())
+
     return ("Ok")
 
 
 def filter(file, char="*"):
 
     with open(file, "r") as f:
-            message = f.read()
+        message = f.read()
 
     profanity.set_censor_characters("*")
     return profanity.censor(message)
 
 
-def extract_indexes(text, char="*"):
+def extract_indexes(ttsid, text, char="*"):
     indexes = []
     in_word = False
     start = 0
@@ -77,29 +74,29 @@ def extract_indexes(text, char="*"):
                 in_word = False
                 indexes.append(((start-1)/len(text),(index)/len(text)))
     
-    with open("index.json", "w") as f:
-            json.dump(indexes, f)
+    with open(f"{ttsid}.json", "w") as f:
+        json.dump(indexes, f)
 
-    return "index.json", indexes
+    return f"{ttsid}.json", indexes
     
     
 def main(args):
 
     ipv4 = args.get("ipv4", "profanity.ipv4.not.given")
     text = args.get("text", "profanity.text.not.given")
-    hostname = args.get("hostname", "profanity.hostname.not.given")
+    ttsid = args.get("ttsid", "profanity.ttsid.not.given")
 
 
     pull_begin = datetime.datetime.now()
-    pull(text, ipv4, hostname)
+    pull(text, ipv4)
     pull_end = datetime.datetime.now()
 
     process_begin = datetime.datetime.now()
-    resultfile, result = extract_indexes(filter(text))
+    resultfile, result = extract_indexes(ttsid, filter(text))
     process_end = datetime.datetime.now()
 
     push_begin = datetime.datetime.now()
-    push(resultfile, ipv4, hostname)
+    push(resultfile, ipv4)
     push_end = datetime.datetime.now()
 
 
@@ -112,5 +109,5 @@ def main(args):
          },
         }
 
-    return {"body":response}
+    return {"body":response, "ipv4": ipv4, "text": text, "ttsid": ttsid}
 

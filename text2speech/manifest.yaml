@@ -5,10 +5,6 @@ packages:
                 function: speech/__main__.py
                 docker: onanad/action-python-v3.9:text2speech
                 web: true
-            conversion:
-                function: conversion/__main__.py
-                docker: onanad/action-python-v3.9:conversion
-                web: true
             profanity:
                 function: profanity/__main__.py
                 docker: onanad/action-python-v3.9:profanity
@@ -22,21 +18,18 @@ packages:
                 web: true
             validation:
                 function: validation/__main__.py
+                docker: onanad/action-python-v3.9:profanity
                 web: true
         sequences:
-            S1: 
+            S1: # Text to speech only
                 actions: demo/text2speech
                 web: true
-            S2: 
-                actions: demo/text2speech, demo/conversion
-                web: true
-            S3: 
+            S3: # Text to speech with censorship
                 actions: demo/coord, demo/censor
                 web: true
-            S4: 
-                actions: demo/validation, demo/text2speech, demo/conversion
+            S4: # Text to speech with jurisdiction validation
+                actions: demo/validation, demo/text2speech
                 web: true
-            S5: 
+            S5: # Full pipeline: jurisdiction validation and text to speech with censorship
                 actions: demo/validation, demo/coord, demo/censor
                 web: true
-         

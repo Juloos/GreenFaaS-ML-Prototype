@@ -4,7 +4,7 @@ version: 1
 arch: x86_64
 alias: ubuntu2204-arm64-min
 description: has openwhisk and its dependencies
-author: support-staff@lists.grid5000.fr
+author: sejules
 visibility: public
 destructive: false
 os: linux

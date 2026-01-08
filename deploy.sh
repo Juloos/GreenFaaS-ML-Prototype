@@ -12,7 +12,7 @@ fi
 echo "Updating git..."
 for HOST in $HOSTS; do
   echo "  on $HOST"
-  ssh root@$HOST "cd GreenFaaS-ML-Prototype ; git pull" >/dev/null 2>&1
+  ssh root@$HOST "cd GreenFaaS-ML-Prototype ; git checkout NoML-Energy-Monitoring ; git pull" >/dev/null 2>&1
 done
 
 echo "Launching OpenWhisk..."
@@ -26,13 +26,14 @@ sleep 1m
 
 IPV4=`cat .ipv4`
 ITERATIONS=`cat .iterations`
-echo "Using ipv4=$IPV4, iterations=$ITERATIONS"
+INSTANCES=`cat .instances`
+echo "Using ipv4=$IPV4, iterations=$ITERATIONS, instances=$INSTANCES"
 
 mkdir -p logs
 echo "Deploying the demo..."
 for HOST in $HOSTS; do
   echo "  on $HOST"
-  ssh root@$HOST "./GreenFaaS-ML-Prototype/run_text2speech.sh '$IPV4' '$ITERATIONS' >tts.log 2>&1" >/dev/null 2>&1 && \
+  ssh root@$HOST "./GreenFaaS-ML-Prototype/run_text2speech.sh '$IPV4' '$ITERATIONS' '$INSTANCES' >tts.log 2>&1" >/dev/null 2>&1 && \
     scp -r root@$HOST:/root/GreenFaaS-ML-Prototype/energy_results . && \
     scp root@$HOST:/root/tts.log logs/$HOST.log &
 done

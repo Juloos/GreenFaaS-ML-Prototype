@@ -23,7 +23,7 @@ def main(args):
     manager = Manager()
     result = manager.dict()
     
-    p1 = Process(target=start, args=("S2", args, result, lock))
+    p1 = Process(target=start, args=("S1", args, result, lock))
     p2 = Process(target=start, args=("profanity", args, result, lock))
     p1.start()
     p2.start()

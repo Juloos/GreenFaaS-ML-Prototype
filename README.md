@@ -42,7 +42,7 @@ The following commands will help you setup an environment file to run the energy
 
 Let the script run until it launches OpenWhisk, then stop it and exit the node.
 
-`flyon:` `$ git clone https://github.com/Juloos/GreenFaaS-ML-Prototype && cd GreenFaaS-ML-Prototype`
+`flyon:` `$ git clone https://github.com/Juloos/GreenFaaS-ML-Prototype --branch "NoML-Energy-Monitoring" && cd GreenFaaS-ML-Prototype`
 
 `flyon:` `$ tgz-g5k -m $NODE -f openwhisk_image.tar.zst`
 
