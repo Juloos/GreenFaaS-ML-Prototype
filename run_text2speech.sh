@@ -48,7 +48,7 @@ for SCHEMA in $SCHEMAS; do
   for TEXT in $TEXTS; do
     start=$(date +%FT%T)
     echo -e "starting $SCHEMA with $TEXT at $start"
-    for (( i = -1 ; i < $ITERATIONS ; i++ )); do
+    for (( i = 0 ; i < $ITERATIONS ; i++ )); do
       printf "Doing $i\r"
       for (( j = 0 ; j < $INSTANCES ; j++ )); do
         ./bin/wsk action invoke "demo/$SCHEMA" -r \
