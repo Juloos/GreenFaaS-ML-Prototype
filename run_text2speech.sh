@@ -50,7 +50,7 @@ for SCHEMA in $SCHEMAS; do
     done
   done
   # Wait for all invocations to finish
-  while [ $(./bin/wsk activation list --name "demo/$SCHEMA" --limit 1000 --skip 0 --since $(date +%s -d "$start") | grep -c "running") -gt 0 ]; do
+  while [ $(./bin/wsk activation list "demo/$SCHEMA" --limit 200 --since $(date +%s -d "$start") | grep -c "running") -gt 0 ]; do
     sleep 1s
   done
   end=$(date +%FT%T)
