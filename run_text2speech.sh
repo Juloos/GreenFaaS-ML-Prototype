@@ -38,20 +38,27 @@ curl -sk "https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metr
   >"energy_results/$HOSTNAME/idle.json" 2>/dev/null
 
 for SCHEMA in $SCHEMAS; do
+  rm -f activations
+  echo "Invoking text2speech with schema $SCHEMA..."
   start=$(date +%FT%T)
   for TEXT in $TEXTS; do
+    echo "  for text $TEXT"
     for (( i = 0 ; i < $ITERATIONS ; i++ )); do
+      echo "    iteration $i"
       ./bin/wsk action invoke "demo/$SCHEMA" \
         -p ipv4 "$IPV4" \
         -p schema "$SCHEMA" \
         -p text "$TEXT" \
         -p ttsid "$HOSTNAME-$SCHEMA-$TEXT-$i" \
-        >/dev/null &
+      | cut -d ' ' -f 6 >>activations
     done
   done
-  # Wait for all invocations to finish
-  while [ $(./bin/wsk activation list "demo/$SCHEMA" --limit 200 --since $(date +%s -d "$start") | grep -c "running") -gt 0 ]; do
-    sleep 1s
+  echo "Waiting for activations to complete..."
+  for ACTIVATION in $(cat activations); do
+    while ( ./bin/wsk activation get "$ACTIVATION" >/dev/null 2>&1 ; test $? -ne 0 ); do
+      sleep 1s
+    done
+    echo "  got $ACTIVATION"
   done
   end=$(date +%FT%T)
   echo "Pulling from https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
