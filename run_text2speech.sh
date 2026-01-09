@@ -10,15 +10,9 @@ else
 fi
 
 if [ -z "$2" ]; then
-  ITERATIONS=10
+  ITERATIONS=20
 else
   ITERATIONS=$2
-fi
-
-if [ -z "$3" ]; then
-  INSTANCES=30
-else
-  INSTANCES=$3
 fi
 
 ./bin/wsk property set --apihost "http://172.17.0.1:3233" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP"
@@ -44,27 +38,22 @@ curl -sk "https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metr
   >"energy_results/$HOSTNAME/idle.json" 2>/dev/null
 
 for SCHEMA in $SCHEMAS; do
-  mkdir -p "energy_results/$HOSTNAME/$SCHEMA/"
+  start=$(date +%FT%T)
   for TEXT in $TEXTS; do
-    start=$(date +%FT%T)
-    echo -e "starting $SCHEMA with $TEXT at $start"
     for (( i = 0 ; i < $ITERATIONS ; i++ )); do
-      printf "Doing $i\r"
-      for (( j = 0 ; j < $INSTANCES ; j++ )); do
-        ./bin/wsk action invoke "demo/$SCHEMA" -r \
-          -p ipv4 "$IPV4" \
-          -p schema "$SCHEMA" \
-          -p text "$TEXT" \
-          -p ttsid "$HOSTNAME-$j" \
-          >/dev/null &
-      done
-      wait
+      ./bin/wsk action invoke "demo/$SCHEMA" -r \
+        -p ipv4 "$IPV4" \
+        -p schema "$SCHEMA" \
+        -p text "$TEXT" \
+        -p ttsid "$HOSTNAME-$SCHEMA-$TEXT-$I" \
+        >/dev/null &
     done
-    end=$(date +%FT%T)
-    echo "Pulling from https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
-    curl -sk "https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
-      >"energy_results/$HOSTNAME/$SCHEMA/$TEXT.json" 2>/dev/null
   done
+  wait
+  end=$(date +%FT%T)
+  echo "Pulling from https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
+  curl -sk "https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
+    >"energy_results/$HOSTNAME/$SCHEMA.json" 2>/dev/null
 done
 
 echo "Cleaning up swift files from host's container..."
