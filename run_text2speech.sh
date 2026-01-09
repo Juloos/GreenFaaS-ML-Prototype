@@ -45,7 +45,7 @@ for SCHEMA in $SCHEMAS; do
         -p ipv4 "$IPV4" \
         -p schema "$SCHEMA" \
         -p text "$TEXT" \
-        -p ttsid "$HOSTNAME-$SCHEMA-$TEXT-$I" \
+        -p ttsid "$HOSTNAME-$SCHEMA-$TEXT-$i" \
         >/dev/null &
     done
   done
