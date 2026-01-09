@@ -41,7 +41,7 @@ for SCHEMA in $SCHEMAS; do
   start=$(date +%FT%T)
   for TEXT in $TEXTS; do
     for (( i = 0 ; i < $ITERATIONS ; i++ )); do
-      ./bin/wsk action invoke "demo/$SCHEMA" -r \
+      ./bin/wsk action invoke "demo/$SCHEMA" \
         -p ipv4 "$IPV4" \
         -p schema "$SCHEMA" \
         -p text "$TEXT" \
@@ -49,7 +49,10 @@ for SCHEMA in $SCHEMAS; do
         >/dev/null &
     done
   done
-  wait
+  # Wait for all invocations to finish
+  while [ $(./bin/wsk activation list --name "demo/$SCHEMA" --limit 1000 --skip 0 --since $(date +%s -d "$start") | grep -c "running") -gt 0 ]; do
+    sleep 1s
+  done
   end=$(date +%FT%T)
   echo "Pulling from https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
   curl -sk "https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
