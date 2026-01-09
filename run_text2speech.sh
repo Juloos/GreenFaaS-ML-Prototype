@@ -3,7 +3,7 @@
 cd "$(dirname "$0")"
 
 if [ -z "$1" ]; then
-  echo "Usage: $0 <ipv4> [<iterations>] [<instances>]"
+  echo "Usage: $0 <ipv4> [<iterations>]"
   exit 1
 else
   IPV4=$1

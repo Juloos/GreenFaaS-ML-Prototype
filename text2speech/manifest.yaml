@@ -5,31 +5,40 @@ packages:
                 function: speech/__main__.py
                 docker: onanad/action-python-v3.9:text2speech
                 web: true
+                timeout: 300000
             profanity:
                 function: profanity/__main__.py
                 docker: onanad/action-python-v3.9:profanity
                 web: true
+                timeout: 300000
             censor:
                 function: censor/__main__.py
                 docker: onanad/action-python-v3.9:censor
                 web: true
+                timeout: 300000
             coord:
                 function: coord/__main__.py
                 web: true
+                timeout: 300000
             validation:
                 function: validation/__main__.py
                 docker: onanad/action-python-v3.9:profanity
                 web: true
+                timeout: 300000
         sequences:
             S1: # Text to speech only
                 actions: demo/text2speech
                 web: true
+                timeout: 300000
             S3: # Text to speech with censorship
                 actions: demo/coord, demo/censor
                 web: true
+                timeout: 300000
             S4: # Text to speech with jurisdiction validation
                 actions: demo/validation, demo/text2speech
                 web: true
+                timeout: 300000
             S5: # Full pipeline: jurisdiction validation and text to speech with censorship
                 actions: demo/validation, demo/coord, demo/censor
                 web: true
+                timeout: 300000
