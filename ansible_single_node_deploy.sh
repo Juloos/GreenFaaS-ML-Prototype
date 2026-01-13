@@ -12,7 +12,7 @@ cd openwhisk
 # ----------------------------
 # Configuration
 # ----------------------------
-OPENWHISK_HOME=${OPENWHISK_HOME:-${pwd}}
+OPENWHISK_HOME=${OPENWHISK_HOME:-$(pwd)}
 ENVIRONMENT=${ENVIRONMENT:-local}
 ANSIBLE_DIR="$OPENWHISK_HOME/ansible"
 
