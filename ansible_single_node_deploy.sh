@@ -246,7 +246,7 @@ pushd "$ANSIBLE_DIR" >/dev/null
 [ ! -f "$ENV_DIR/hosts" ] && echo "localhost" > "$ENV_DIR/hosts"
 
 ansible-playbook -i "environments/${ENVIRONMENT}" ${ANSIBLE_PLAYBOOKS[@]} \
-  --extra-vars "config_root_dir=$config_root_dir env_hosts_dir=$ENV_DIR inventory_dir=$ENV_DIR docker_host=unix:///var/run/docker.sock docker_python_module=docker" kafka_certs_dir=$KAFKA_CERTS_DIR" -v
+  --extra-vars "config_root_dir=$config_root_dir env_hosts_dir=$ENV_DIR inventory_dir=$ENV_DIR docker_host=unix:///var/run/docker.sock docker_python_module=docker kafka_certs_dir=$KAFKA_CERTS_DIR" -v
 
 popd >/dev/null
 
