@@ -245,6 +245,17 @@ pushd "$ANSIBLE_DIR" >/dev/null
 # Generate host file if missing
 [ ! -f "$ENV_DIR/hosts" ] && echo "localhost" > "$ENV_DIR/hosts"
 
+# Patch docker login task to be conditional
+sed -i \
+'/name: docker login/,/when:/{
+  /when:/c\
+when:\
+  - docker_registry is defined\
+  - docker_registry != ""\
+  - docker_registry_password is defined
+}' \
+tasks/docker_login.yml
+
 ansible-playbook -i "environments/${ENVIRONMENT}" ${ANSIBLE_PLAYBOOKS[@]} \
   --extra-vars "config_root_dir=$config_root_dir env_hosts_dir=$ENV_DIR inventory_dir=$ENV_DIR docker_host=unix:///var/run/docker.sock docker_python_module=docker kafka_certs_dir=$KAFKA_CERTS_DIR" -v
 
