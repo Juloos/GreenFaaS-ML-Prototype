@@ -11,7 +11,8 @@ cd openwhisk
 
 OPENWHISK_HOME="$(pwd)"
 ENVIRONMENT="local"
-ENV_DIR="ansible/environments/${ENVIRONMENT}"
+ENV_DIR="$(realpath "$OPENWHISK_HOME/ansible/environments/$ENVIRONMENT")"
+CONFIG_ROOT_DIR="$ENV_DIR/config"
 ANSIBLE_DIR="ansible"
 ANSIBLE_PLAYBOOKS=("setup.yml" "couchdb.yml" "initdb.yml" "wipe.yml" "openwhisk.yml" "postdeploy.yml" "apigateway.yml" "routemgmt.yml")
 VENV_DIR="/opt/openwhisk-venv"
@@ -21,8 +22,8 @@ GRADLEW="./gradlew"
 
 export ANSIBLE_HOST_KEY_CHECKING=False
 export OPENWHISK_ENVIRONMENT="$ENVIRONMENT"
-export env_hosts_dir="$ENV_DIR"
-export config_root_dir="$ENV_DIR/config"
+export env_hosts_dir=$(realpath "$ENV_DIR")
+export config_root_dir=$(realpath "$CONFIG_ROOT_DIR")
 export DOCKER_HOST="unix:///var/run/docker.sock"
 
 #############################################
@@ -231,9 +232,8 @@ rm -f "$config_root_dir/nginx/openwhisk-server-cert.pem" \
 #############################################
 
 echo "Starting OpenWhisk deployment..."
+
 mkdir -p "$OPENWHISK_HOME/environments/$ENVIRONMENT"
-ENV_DIR=$(realpath "$OPENWHISK_HOME/environments/$ENVIRONMENT")
-CONFIG_ROOT_DIR="$ENV_DIR/config"
 
 # Kafka certs directory
 KAFKA_CERTS_DIR="$CONFIG_ROOT_DIR/kafka/certs"
