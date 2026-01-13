@@ -29,6 +29,15 @@ mkdir -p "$KAFKA_CERTS_DIR"
 export KAFKA_CERTS_DIR
 
 # ----------------------------
+# Update system packages
+# ----------------------------
+apt-get update
+apt-get install -y curl wget git lsb-release ca-certificates \
+                   build-essential unzip tar python3-venv python3-pip \
+                   openjdk-11-jdk npm locales bash sed openssl
+locale-gen en_US.UTF-8
+
+# ----------------------------
 # Ensure virtualenv exists
 # ----------------------------
 if [ ! -d "$OPENWHISK_HOME/openwhisk-venv" ]; then
@@ -47,15 +56,6 @@ echo "Cleaning up existing OpenWhisk containers..."
 docker ps -a --filter "name=^/whisk_" --format "{{.ID}}" | xargs -r docker rm -f || true
 docker ps -a --filter "name=^/kafka" --format "{{.ID}}" | xargs -r docker rm -f || true
 docker ps -a --filter "name=^/couchdb" --format "{{.ID}}" | xargs -r docker rm -f || true
-
-# ----------------------------
-# Update system packages
-# ----------------------------
-apt-get update
-apt-get install -y curl wget git lsb-release ca-certificates \
-                   build-essential unzip tar python3-venv python3-pip \
-                   openjdk-11-jdk npm locales bash sed openssl
-locale-gen en_US.UTF-8
 
 # ----------------------------
 # Build OpenWhisk Docker images
