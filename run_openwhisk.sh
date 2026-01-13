@@ -9,6 +9,7 @@ cat core/standalone/src/main/resources/standalone.conf | \
     sed "s/limits-actions-sequence-maxLength = 50/limits-actions-sequence-maxLength = 999999/ ;
          s/limits-triggers-fires-perMinute = 60/limits-triggers-fires-perMinute = 999999/ ;
          s/limits-actions-invokes-perMinute = 60/limits-actions-invokes-perMinute = 999999/ ;
-         s/limits-actions-invokes-concurrent = 30/limits-actions-invokes-concurrent = 999999/" \
+         s/limits-actions-invokes-concurrent = 30/limits-actions-invokes-concurrent = 999999/ ;
+         s/config {/concurrency-limit {\n    min = 1\n    max = 24\n    std = 4\n  }\n\n  config {/" \
     >standalone.conf.modified
 ./gradlew core:standalone:bootRun --args="-c $(realpath standalone.conf.modified)"
