@@ -31,6 +31,7 @@ def main(args):
     p2.join()
     
     result = dict(result)
+    result.update(args)
     result["validation"] = val
 
-    return  result
+    return result
