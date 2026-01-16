@@ -75,7 +75,7 @@ def main(args):
     process_end = datetime.datetime.now()
 
     response = {
-         "wordCount" : len(result),
+         "wordCount" : result,
          "validation" : {
             "process" : (process_end - process_begin) / datetime.timedelta(seconds=1),
             "pull" : (pull_end - pull_begin) / datetime.timedelta(seconds=1),
