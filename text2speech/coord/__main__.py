@@ -5,7 +5,7 @@ from multiprocessing import Process, Manager, Lock
 
 def start(action, args, result, lock):
 
-    apihost = f"http://%s:%s/api/v1/web/guest/demo/{action}?blocking=true&result=true"
+    apihost = f"https://%s:%s/api/v1/web/guest/demo/{action}?blocking=true&result=true"
     
     r = None
     for host in ["172.17.0.1", "host.docker.internal"]:
