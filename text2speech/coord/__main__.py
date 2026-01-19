@@ -14,8 +14,9 @@ def start(action, args, result, lock):
                 break
             except requests.exceptions.ConnectionError:
                 continue
-    with lock:
-        result.update(r.json())  
+    if r is not None:
+        with lock:
+            result.update(r.json())  
 
      
 def main(args):
