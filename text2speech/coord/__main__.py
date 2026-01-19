@@ -16,7 +16,7 @@ def start(action, args, result, lock):
             except requests.exceptions.ConnectionError:
                 continue
     if r is not None:
-        print(repr(r))
+        print(repr(r.raw))
         with lock:
             result.update(r.json())  
 
@@ -35,6 +35,10 @@ def main(args):
     p2.start()
     p1.join()
     p2.join()
+
+    if p1.exitcode != 0 or p2.exitcode != 0:
+        print("Error in subprocess")
+        sys.exit(1)
     
     result = dict(result)
     result.update(args)
