@@ -2,6 +2,7 @@ import swiftclient
 import datetime
 import os
 import subprocess
+import shutil
 
 
 def pull(obj, ipv4):
@@ -19,9 +20,9 @@ def pull(obj, ipv4):
     	auth_version='1'
 	)
 
-    file = conn.get_object("whiskcontainer", obj)
+    _, body = conn.get_object("whiskcontainer", obj)
     with open(out, 'wb') as f:
-        f.write(file[1])
+        shutil.copyfileobj(body, f)
 
     return ("Ok")
 
@@ -41,7 +42,7 @@ def push(obj, ipv4):
 	)
  
     with open(obj, 'rb') as f:
-        conn.put_object("whiskcontainer", obj, contents=f.read())
+        conn.put_object("whiskcontainer", obj, contents=f)
  
     return ("Ok")
 

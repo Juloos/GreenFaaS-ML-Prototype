@@ -4,26 +4,7 @@ import json
 import wave
 import numpy as np
 import datetime
-
-
-def push(obj, ipv4):
-
-    # Swift identifiant
-    auth_url = f'http://{ipv4}:8080/auth/v1.0'
-    username = 'test:tester'
-    password = 'testing'
-	# Connect to Swift
-    conn = swiftclient.Connection(
-    	authurl=auth_url,
-    	user=username,
-    	key=password,
-    	auth_version='1'
-	)
- 
-    with open(obj, 'rb') as f:
-        conn.put_object("whiskcontainer", obj, contents=f.read())
- 
-    return ("Ok")
+import shutil
 
 
 def pull(obj, ipv4):
@@ -41,11 +22,32 @@ def pull(obj, ipv4):
     	auth_version='1'
 	)
 
-    file = conn.get_object("whiskcontainer", obj)
+    _, body = conn.get_object("whiskcontainer", obj)
     with open(out, 'wb') as f:
-        f.write(file[1])
+        shutil.copyfileobj(body, f)
 
     return ("Ok")
+
+
+def push(obj, ipv4):
+
+    # Swift identifiant
+    auth_url = f'http://{ipv4}:8080/auth/v1.0'
+    username = 'test:tester'
+    password = 'testing'
+	# Connect to Swift
+    conn = swiftclient.Connection(
+    	authurl=auth_url,
+    	user=username,
+    	key=password,
+    	auth_version='1'
+	)
+ 
+    with open(obj, 'rb') as f:
+        conn.put_object("whiskcontainer", obj, contents=f)
+ 
+    return ("Ok")
+
 
 def censor(file, ttsid):
     # Open the input WAV file
