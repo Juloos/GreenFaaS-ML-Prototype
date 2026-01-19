@@ -49,7 +49,7 @@ def push(obj, ipv4):
 def espeakSpeech(file, ttsid):
     with open(file, 'r') as f:
         textSize = len(f.read())
-    command = f'espeak-ng -f {file} --stdout | ffmpeg -y -i pipe: {ttsid}.wav -loglevel quiet'
+    command = f'espeak-ng -f {file} -w {ttsid}.wav'
     # Run the command in the shell
     subprocess.run(command, shell=True, check=True)
     return f"{ttsid}.wav", textSize
