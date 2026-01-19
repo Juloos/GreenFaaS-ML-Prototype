@@ -16,7 +16,7 @@ def start(action, args, result, lock):
             except requests.exceptions.ConnectionError:
                 continue
     if r is not None:
-        print(repr(r.raw.data))
+        print(r.text)
         with lock:
             result.update(r.json())  
 
