@@ -8,7 +8,7 @@ import shutil
 
 
 def pull(obj, ipv4):
-  
+
     # Swift identifiant
     auth_url = f'http://{ipv4}:8080/auth/v1.0'
     username = 'test:tester'
@@ -22,7 +22,7 @@ def pull(obj, ipv4):
     	auth_version='1'
 	)
 
-    _, body = conn.get_object("whiskcontainer", obj)
+    _, body = conn.get_object("whiskcontainer", obj, resp_chunk_size=65536)
     with open(out, 'wb') as f:
         shutil.copyfileobj(body, f)
 

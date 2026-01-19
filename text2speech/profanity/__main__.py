@@ -11,9 +11,7 @@ def pull(obj, ipv4):
     auth_url = f'http://{ipv4}:8080/auth/v1.0'
     username = 'test:tester'
     password = 'testing'
-
-    out = obj 
-
+    out = obj
     # Connect to Swift
     conn = swiftclient.Connection(
     	authurl=auth_url,
@@ -22,7 +20,7 @@ def pull(obj, ipv4):
     	auth_version='1'
 	)
 
-    _, body = conn.get_object("whiskcontainer", obj)
+    _, body = conn.get_object("whiskcontainer", obj, resp_chunk_size=65536)
     with open(out, 'wb') as f:
         shutil.copyfileobj(body, f)
 
