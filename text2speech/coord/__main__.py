@@ -11,7 +11,7 @@ def start(action, args, result, lock):
     for host in ["172.17.0.1", "host.docker.internal"]:
         for port in ["31001", "3233"]:
             try:
-                r = requests.get(apihost % (host, port), headers={"Content-Type": "application/json"}, params=args)
+                r = requests.get(apihost % (host, port), headers={"Content-Type": "application/json"}, params=args, verify=False)
                 break
             except requests.exceptions.ConnectionError:
                 continue
