@@ -66,7 +66,7 @@ for SCHEMA in $SCHEMAS; do
         IPV4I=$(( (IPV4I + 1) % ${#IPV4LIST[@]} ))
       done
     done
-    echo "Waiting for activations to complete..."
+    echo "  (run $run) waiting for activations to complete..."
     for ACTIVATION in $(cat activations); do
       while ( ./bin/wsk -i activation get "$ACTIVATION" >/dev/null 2>&1 ; test $? -ne 0 ); do
         sleep 1s
