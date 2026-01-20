@@ -48,10 +48,10 @@ curl -sk "https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metr
 
 IPV4I=0
 for SCHEMA in $SCHEMAS; do
-  rm -f activations
-  echo "Invoking text2speech with schema $SCHEMA..."
+  echo "schema $SCHEMA"
   start=$(date +%FT%T)
   for (( run = 0 ; run < $RUNS ; run++ )); do
+    rm -f activations
     echo "  run $run"
     for TEXT in $TEXTS; do
       echo "    for text $TEXT"
