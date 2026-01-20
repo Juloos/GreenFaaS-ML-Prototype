@@ -27,7 +27,7 @@ HOSTNAME=$(hostname)
 mkdir -p "energy_results/$HOSTNAME/"
 
 echo "Uploading swift files to host's container..." # Redundant but just in case, also there should be only few hosts running this script
-for IPV4 in $IPV4LIST; do
+for IPV4 in ${IPV4LIST[@]}; do
   echo "  for ipv4 $IPV4"
   swift upload "whiskcontainer" swift_files --object-name "." --skip-identical -A "http://$IPV4:8080/auth/v1.0" -U "test:tester" -K "testing"
 done
@@ -72,7 +72,7 @@ for SCHEMA in $SCHEMAS; do
 done
 
 echo "Cleaning up swift files from host's container..."
-for IPV4 in $IPV4LIST; do
+for IPV4 in ${IPV4LIST[@]}; do
   echo "  for ipv4 $IPV4"
   swift upload "whiskcontainer" --prefix "$HOSTNAME" -A "http://$IPV4:8080/auth/v1.0" -U "test:tester" -K "testing"
 done
