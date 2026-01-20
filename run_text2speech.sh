@@ -15,7 +15,7 @@ else
   ITERATIONS=$2
 fi
 
-./bin/wsk property set --apihost "http://172.17.0.1:3233" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP"
+./bin/wsk -i property set --apihost "http://localhost:31001" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP"
 ./bin/wskdeploy -m text2speech/manifest.yaml || 
   { echo "Failed to deploy, make sure OpenWhisk is running."; exit 1; }
 
@@ -49,7 +49,7 @@ for SCHEMA in $SCHEMAS; do
     echo "  for text $TEXT"
     for (( i = 0 ; i < $ITERATIONS ; i++ )); do
       echo "    iteration $i"
-      ./bin/wsk action invoke "demo/$SCHEMA" \
+      ./bin/wsk -i action invoke "demo/$SCHEMA" \
         -p ipv4 "${IPV4LIST[$IPV4I]}" \
         -p schema "$SCHEMA" \
         -p text "$TEXT" \
