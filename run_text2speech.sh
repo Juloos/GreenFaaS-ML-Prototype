@@ -60,7 +60,7 @@ for SCHEMA in $SCHEMAS; do
   done
   echo "Waiting for activations to complete..."
   for ACTIVATION in $(cat activations); do
-    while ( ./bin/wsk activation get "$ACTIVATION" >/dev/null 2>&1 ; test $? -ne 0 ); do
+    while ( ./bin/wsk -i activation get "$ACTIVATION" >/dev/null 2>&1 ; test $? -ne 0 ); do
       sleep 1s
     done
     echo "  got $ACTIVATION"
