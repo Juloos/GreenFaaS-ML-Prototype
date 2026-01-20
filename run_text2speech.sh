@@ -48,7 +48,7 @@ for SCHEMA in $SCHEMAS; do
   for TEXT in $TEXTS; do
     echo "  for text $TEXT"
     for (( i = 0 ; i < $ITERATIONS ; i++ )); do
-      echo "    iteration $i (ipv4 index $IPV4I)"
+      echo "    iteration $i (ipv4 ${IPV4LIST[$IPV4I]})"
       ./bin/wsk -i action invoke "demo/$SCHEMA" \
         -p ipv4 "${IPV4LIST[$IPV4I]}" \
         -p schema "$SCHEMA" \
