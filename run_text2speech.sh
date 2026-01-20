@@ -74,5 +74,5 @@ done
 echo "Cleaning up swift files from host's container..."
 for IPV4 in ${IPV4LIST[@]}; do
   echo "  for ipv4 $IPV4"
-  swift upload "whiskcontainer" -A "http://$IPV4:8080/auth/v1.0" -U "test:tester" -K "testing"
+  swift delete "whiskcontainer" -A "http://$IPV4:8080/auth/v1.0" -U "test:tester" -K "testing"
 done

@@ -20,7 +20,7 @@ for hostname in HOSTS:
 
 with open("all.csv", "w") as fout:
     csv_writer = csv.writer(fout)
-    csv_writer.writerow(["schema", "text", "watts", "milliseconds"])
+    csv_writer.writerow(["schema", "text", "joules", "milliseconds"])
     for schema in SCHEMAS:
         total = 0
         milliseconds = 0
@@ -28,14 +28,16 @@ with open("all.csv", "w") as fout:
             with open("%s/%s.json" % (hostname, schema), "r") as fin:
                 data = json.load(fin)
             try:
+                timechunkms = 20
                 start = datetime.datetime.strptime(data[0]["timestamp"], "%Y-%m-%dT%H:%M:%S.%f%z")
                 end = datetime.datetime.strptime(data[-1]["timestamp"], "%Y-%m-%dT%H:%M:%S.%f%z")
             except ValueError:
+                timechunkms = 1000
                 start = datetime.datetime.strptime(data[0]["timestamp"], "%Y-%m-%dT%H:%M:%S%z")
                 end = datetime.datetime.strptime(data[-1]["timestamp"], "%Y-%m-%dT%H:%M:%S%z")
-            host_total = sum((float(d["value"]) - idle_watts_of[hostname]) for d in data)
+            host_total = sum((float(d["value"]) - idle_watts_of[hostname]) for d in data) / timechunkms
             host_milliseconds = (end - start).total_seconds() * 1000
-            print(f"{hostname}/{schema} : {host_total}W | {host_milliseconds}ms")
+            print(f"{hostname}/{schema} : {host_total}J | {host_milliseconds}ms")
             total += host_total
             milliseconds += host_milliseconds
         total = total / len(HOSTS)
