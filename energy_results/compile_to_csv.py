@@ -21,39 +21,23 @@ for hostname in HOSTS:
 with open("all.csv", "w") as fout:
     csv_writer = csv.writer(fout)
     csv_writer.writerow(["schema", "text", "watts", "milliseconds"])
-    if len(TEXTS) > 1:
-        for schema in SCHEMAS:
-            for text in TEXTS:
-                total = 0
-                milliseconds = 0
-                for hostname in HOSTS:
-                    with open("%s/%s/%s.json" % (hostname, schema, text), "r") as fin:
-                        data = json.load(fin)
-                    start = datetime.datetime.strptime(data[0]["timestamp"], "%Y-%m-%dT%H:%M:%S.%f%z")
-                    end = datetime.datetime.strptime(data[-1]["timestamp"], "%Y-%m-%dT%H:%M:%S.%f%z")
-                    host_total = sum((float(d["value"]) - idle_watts_of[hostname]) for d in data)
-                    host_milliseconds = (end - start).total_seconds() * 1000
-                    print(f"{hostname}/{schema}/{text} : {host_total}W | {host_milliseconds}ms")
-                    total += host_total
-                    milliseconds += host_milliseconds
-                total = total / len(HOSTS)
-                milliseconds = milliseconds / len(HOSTS)
-                csv_writer.writerow([schema, text, total, milliseconds])
-    else:
-        text = TEXTS[0]
-        for schema in SCHEMAS:
-            total = 0
-            milliseconds = 0
-            for hostname in HOSTS:
-                with open("%s/%s.json" % (hostname, schema), "r") as fin:
-                    data = json.load(fin)
+    for schema in SCHEMAS:
+        total = 0
+        milliseconds = 0
+        for hostname in HOSTS:
+            with open("%s/%s.json" % (hostname, schema), "r") as fin:
+                data = json.load(fin)
+            try:
                 start = datetime.datetime.strptime(data[0]["timestamp"], "%Y-%m-%dT%H:%M:%S.%f%z")
                 end = datetime.datetime.strptime(data[-1]["timestamp"], "%Y-%m-%dT%H:%M:%S.%f%z")
-                host_total = sum((float(d["value"]) - idle_watts_of[hostname]) for d in data)
-                host_milliseconds = (end - start).total_seconds() * 1000
-                print(f"{hostname}/{schema}/{text} : {host_total}W | {host_milliseconds}ms")
-                total += host_total
-                milliseconds += host_milliseconds
-            total = total / len(HOSTS)
-            milliseconds = milliseconds / len(HOSTS)
-            csv_writer.writerow([schema, text, total, milliseconds])
+            except ValueError:
+                start = datetime.datetime.strptime(data[0]["timestamp"], "%Y-%m-%dT%H:%M:%S%z")
+                end = datetime.datetime.strptime(data[-1]["timestamp"], "%Y-%m-%dT%H:%M:%S%z")
+            host_total = sum((float(d["value"]) - idle_watts_of[hostname]) for d in data)
+            host_milliseconds = (end - start).total_seconds() * 1000
+            print(f"{hostname}/{schema} : {host_total}W | {host_milliseconds}ms")
+            total += host_total
+            milliseconds += host_milliseconds
+        total = total / len(HOSTS)
+        milliseconds = milliseconds / len(HOSTS)
+        csv_writer.writerow([schema, total, milliseconds])
