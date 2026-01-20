@@ -3,10 +3,10 @@
 cd "$(dirname "$0")"
 
 if [ -z "$1" ]; then
-  echo "Usage: $0 <ipv4> [<iterations>]"
+  echo "Usage: $0 <ipv4s> [<iterations>]"
   exit 1
 else
-  IPV4=$1
+  IPV4LIST=$(echo "$1" | tr -s ',' ' ')
 fi
 
 if [ -z "$2" ]; then
@@ -27,7 +27,10 @@ HOSTNAME=$(hostname)
 mkdir -p "energy_results/$HOSTNAME/"
 
 echo "Uploading swift files to host's container..." # Redundant but just in case, also there should be only few hosts running this script
-swift upload "whiskcontainer" swift_files --object-name "." --skip-identical -A "http://$1:8080/auth/v1.0" -U "test:tester" -K "testing"
+for IPV4 in $IPV4LIST; do
+  echo "  for ipv4 $IPV4"
+  swift upload "whiskcontainer" swift_files --object-name "." --skip-identical -A "http://$IPV4:8080/auth/v1.0" -U "test:tester" -K "testing"
+done
 
 echo Waiting 1m...
 start=$(date +%FT%T)
@@ -37,6 +40,7 @@ echo "Pulling from https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOST
 curl -sk "https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
   >"energy_results/$HOSTNAME/idle.json" 2>/dev/null
 
+IPV4I=0
 for SCHEMA in $SCHEMAS; do
   rm -f activations
   echo "Invoking text2speech with schema $SCHEMA..."
@@ -46,11 +50,12 @@ for SCHEMA in $SCHEMAS; do
     for (( i = 0 ; i < $ITERATIONS ; i++ )); do
       echo "    iteration $i"
       ./bin/wsk action invoke "demo/$SCHEMA" \
-        -p ipv4 "$IPV4" \
+        -p ipv4 "${IPV4LIST[$IPV4I]}" \
         -p schema "$SCHEMA" \
         -p text "$TEXT" \
         -p ttsid "$HOSTNAME-$SCHEMA-$TEXT-$i" \
       | cut -d ' ' -f 6 >>activations
+      IPV4I=$(( (IPV4I + 1) % $(echo "$IPV4LIST" | wc -w) ))
     done
   done
   echo "Waiting for activations to complete..."
@@ -67,4 +72,7 @@ for SCHEMA in $SCHEMAS; do
 done
 
 echo "Cleaning up swift files from host's container..."
-swift delete "whiskcontainer" --prefix "$HOSTNAME" -A "http://$1:8080/auth/v1.0" -U "test:tester" -K "testing"
+for IPV4 in $IPV4LIST; do
+  echo "  for ipv4 $IPV4"
+  swift upload "whiskcontainer" --prefix "$HOSTNAME" -A "http://$IPV4:8080/auth/v1.0" -U "test:tester" -K "testing"
+done
