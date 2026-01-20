@@ -6,7 +6,7 @@ if [ -z "$1" ]; then
   echo "Usage: $0 <ipv4s> [<iterations>]"
   exit 1
 else
-  IFS=',' read -ra fruits <<< "$1"
+  IFS=',' read -ra IPV4LIST <<< "$1"
 fi
 
 if [ -z "$2" ]; then
