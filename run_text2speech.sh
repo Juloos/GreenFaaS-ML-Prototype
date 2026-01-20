@@ -3,7 +3,7 @@
 cd "$(dirname "$0")"
 
 if [ -z "$1" ]; then
-  echo "Usage: $0 <ipv4s> [<iterations>]"
+  echo "Usage: $0 <ipv4s> [<iterations>] [<runs>]"
   exit 1
 else
   IFS=',' read -ra IPV4LIST <<< "$1"
@@ -13,6 +13,12 @@ if [ -z "$2" ]; then
   ITERATIONS=20
 else
   ITERATIONS=$2
+fi
+
+if [ -z "$3" ]; then
+  RUNS=10
+else
+  RUNS=$3
 fi
 
 ./bin/wsk -i property set --apihost "https://localhost:31001" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP"
@@ -45,25 +51,28 @@ for SCHEMA in $SCHEMAS; do
   rm -f activations
   echo "Invoking text2speech with schema $SCHEMA..."
   start=$(date +%FT%T)
-  for TEXT in $TEXTS; do
-    echo "  for text $TEXT"
-    for (( i = 0 ; i < $ITERATIONS ; i++ )); do
-      echo "    iteration $i (ipv4 ${IPV4LIST[IPV4I]})"
-      ./bin/wsk -i action invoke "demo/$SCHEMA" \
-        -p ipv4 "${IPV4LIST[IPV4I]}" \
-        -p schema "$SCHEMA" \
-        -p text "$TEXT" \
-        -p ttsid "$HOSTNAME-$SCHEMA-$TEXT-$i" \
-      | cut -d ' ' -f 6 >>activations
-      IPV4I=$(( (IPV4I + 1) % ${#IPV4LIST[@]} ))
+  for (( run = 0 ; run < $RUNS ; run++ )); do
+    echo "  run $run"
+    for TEXT in $TEXTS; do
+      echo "    for text $TEXT"
+      for (( i = 0 ; i < $ITERATIONS ; i++ )); do
+        echo "      iteration $i (ipv4: ${IPV4LIST[IPV4I]})"
+        ./bin/wsk -i action invoke "demo/$SCHEMA" \
+          -p ipv4 "${IPV4LIST[IPV4I]}" \
+          -p schema "$SCHEMA" \
+          -p text "$TEXT" \
+          -p ttsid "$HOSTNAME-$SCHEMA-$TEXT-$i" \
+        | cut -d ' ' -f 6 >>activations
+        IPV4I=$(( (IPV4I + 1) % ${#IPV4LIST[@]} ))
+      done
     done
-  done
-  echo "Waiting for activations to complete..."
-  for ACTIVATION in $(cat activations); do
-    while ( ./bin/wsk -i activation get "$ACTIVATION" >/dev/null 2>&1 ; test $? -ne 0 ); do
-      sleep 1s
+    echo "Waiting for activations to complete..."
+    for ACTIVATION in $(cat activations); do
+      while ( ./bin/wsk -i activation get "$ACTIVATION" >/dev/null 2>&1 ; test $? -ne 0 ); do
+        sleep 1s
+      done
+      echo "    got $ACTIVATION"
     done
-    echo "  got $ACTIVATION"
   done
   end=$(date +%FT%T)
   echo "Pulling from https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
