@@ -48,14 +48,14 @@ for SCHEMA in $SCHEMAS; do
   for TEXT in $TEXTS; do
     echo "  for text $TEXT"
     for (( i = 0 ; i < $ITERATIONS ; i++ )); do
-      echo "    iteration $i (ipv4 ${IPV4LIST[$IPV4I]})"
+      echo "    iteration $i (ipv4 ${IPV4LIST[IPV4I]})"
       ./bin/wsk -i action invoke "demo/$SCHEMA" \
-        -p ipv4 "${IPV4LIST[$IPV4I]}" \
+        -p ipv4 "${IPV4LIST[IPV4I]}" \
         -p schema "$SCHEMA" \
         -p text "$TEXT" \
         -p ttsid "$HOSTNAME-$SCHEMA-$TEXT-$i" \
       | cut -d ' ' -f 6 >>activations
-      IPV4I=$(( (IPV4I + 1) % $(echo "$IPV4LIST" | wc -w) ))
+      IPV4I=$(( (IPV4I + 1) % ${#IPV4LIST[@]} ))
     done
   done
   echo "Waiting for activations to complete..."
