@@ -8,12 +8,12 @@ import shutil
 
 
 def pull(obj, ipv4):
-
+  
     # Swift identifiant
     auth_url = f'http://{ipv4}:8080/auth/v1.0'
     username = 'test:tester'
     password = 'testing'
-    out = obj
+    out = obj 
     # Connect to Swift
     conn = swiftclient.Connection(
     	authurl=auth_url,
@@ -48,37 +48,63 @@ def push(obj, ipv4):
  
     return ("Ok")
 
-
-def censor(file, ttsid):
-    # Open the input WAV file
-    with wave.open(file, 'rb') as wav_file:
-        params = wav_file.getparams()
-        nframes = wav_file.getnframes()
-        frames = wav_file.readframes(nframes)
-
-    # Convert audio frames to numpy array
-    samples = np.frombuffer(frames, dtype=np.int16)
-    samples = samples.copy()
-
-    # Load the index JSON data
-    with open(f"{ttsid}.json", 'r') as f:
+def censor(file, ttsid, chunk_frames=4096):
+    # Load censor index data
+    with open(f"{ttsid}.json", "r") as f:
         indexes = json.load(f)
 
-    # Calculate total number of samples
-    total_samples = len(samples)
+    # Open input and output WAV files
+    with wave.open(file, "rb") as wav_in:
+        params = wav_in.getparams()
+        total_frames = wav_in.getnframes()
 
-    for start, end in indexes:
-        start_sample = int(start * total_samples)
-        end_sample = int(end * total_samples)
-        samples[start_sample:end_sample] = 0
+        # Convert relative indexes to absolute frame ranges
+        censor_ranges = [
+            (int(start * total_frames), int(end * total_frames))
+            for start, end in indexes
+        ]
 
-    # Convert the modified numpy array back to bytes
-    new_frames = samples.tobytes()
+        with wave.open("censored.wav", "wb") as wav_out:
+            wav_out.setparams(params)
 
-    # Save the censored audio to a new file
-    with wave.open("censored.wav", 'wb') as wav_out:
-        wav_out.setparams(params)
-        wav_out.writeframes(new_frames)
+            current_frame = 0
+            range_idx = 0
+
+            while current_frame < total_frames:
+                # Read a chunk of frames
+                frames_to_read = min(chunk_frames, total_frames - current_frame)
+                frames = wav_in.readframes(frames_to_read)
+
+                # Convert chunk to NumPy array (no full copy)
+                samples = np.frombuffer(frames, dtype=np.int16)
+
+                # Apply censoring for overlapping ranges
+                chunk_start = current_frame
+                chunk_end = current_frame + frames_to_read
+
+                while range_idx < len(censor_ranges):
+                    r_start, r_end = censor_ranges[range_idx]
+
+                    if r_end <= chunk_start:
+                        range_idx += 1
+                        continue
+
+                    if r_start >= chunk_end:
+                        break
+
+                    # Calculate overlap within this chunk
+                    local_start = max(0, r_start - chunk_start)
+                    local_end = min(frames_to_read, r_end - chunk_start)
+                    samples[local_start:local_end] = 0
+
+                    if r_end <= chunk_end:
+                        range_idx += 1
+                    else:
+                        break
+
+                # Write processed chunk
+                wav_out.writeframes(samples.tobytes())
+                current_frame += frames_to_read
 
     return "censored.wav"
 
