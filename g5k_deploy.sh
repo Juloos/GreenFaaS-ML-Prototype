@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#OAR -t monitor="wattmetre_power_watt"
+#OAR -t monitor=wattmetre_power_watt
 #OAR -t destructive
 #OAR -t deploy
 
