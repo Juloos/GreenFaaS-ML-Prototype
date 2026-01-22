@@ -2,7 +2,7 @@
 
 #OAR -t deploy
 #OAR -l host=1,walltime=2:00:00
-#OAR -p "wattmeter=YES"
+#OAR -p wattmeter=YES
 
 
 cd "$(dirname "$0")"
