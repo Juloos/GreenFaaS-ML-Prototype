@@ -9,11 +9,11 @@ visibility: public
 destructive: true
 os: linux
 image:
-  file: http://public/~$KADEPLOY_USER/docker_swift_x86_64.tar.zst
+  file: http://public/~{{USER}}/docker_swift_x86_64.tar.zst
   kind: tar
   compression: zstd
 postinstalls:
-- archive: http://public/~$KADEPLOY_USER/g5k-postinstall-unipart.tgz
+- archive: http://public/~{{USER}}/g5k-postinstall-unipart.tgz
   compression: gzip
   script: g5k-postinstall --net netplan --disk-aliases --fstab custom
 boot:
@@ -34,11 +34,11 @@ visibility: public
 destructive: true
 os: linux
 image:
-  file: http://public/~$KADEPLOY_USER/docker_swift_aarch64.tar.zst
+  file: http://public/~{{USER}}/docker_swift_aarch64.tar.zst
   kind: tar
   compression: zstd
 postinstalls:
-- archive: http://public/~$KADEPLOY_USER/g5k-postinstall-unipart.tgz
+- archive: http://public/~{{USER}}/g5k-postinstall-unipart.tgz
   compression: gzip
   script: g5k-postinstall --net netplan --disk-aliases --fstab custom
 boot:
