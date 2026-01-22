@@ -16,7 +16,7 @@ rm ~/public/openwhisk_kube_*.tar.zst ~/public/docker_swift_*.tar.zst
 rm g5k_image_cooking*.log
 
 cp -r ./g5k_deploy/public/* ~/public/
-for config_file in $(ls ./g5k_deploy/public/*.yml); do
+for config_file in $(basename -a ./g5k_deploy/public/*.yml); do
   sed "s/{{USER}}/$USER/g" -i "~/public/$config_file"
 done
 
