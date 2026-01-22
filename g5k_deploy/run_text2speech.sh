@@ -31,7 +31,7 @@ else
 fi
 
 wsk -i property set --apihost "https://localhost:31001" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP"
-wskdeploy -m text2speech/manifest.yaml || 
+wskdeploy -m text2speech/manifest.yml || 
   { echo "Failed to deploy, make sure Openwhisk is running."; exit 1; }
 
 SCHEMAS="S1 S3 S4 S5"

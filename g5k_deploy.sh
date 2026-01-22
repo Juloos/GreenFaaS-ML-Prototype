@@ -30,10 +30,10 @@ SWIFT_HOSTS=`echo $HOSTS | cut -d ' ' -f $(($N_OW_HOSTS + 1))-`
 
 
 echo "Deploying Openwhisk on $OW_HOSTS"
-echo $OW_HOSTS | kadeploy3 -f - -a ~/public/openwhisk_env.yaml -p SYSTEM --custom-steps ~/public/partitioning.yml -s ./g5k_deploy/run_openwhisk.sh | & sed "s/^/  /"
+echo $OW_HOSTS | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml -s ./g5k_deploy/run_openwhisk.sh | & sed "s/^/  /"
 
 echo "Deploying Swift on $SWIFT_HOSTS"
-echo $SWIFT_HOSTS | kadeploy3 -f - -a ~/public/swift_env.yaml -p SYSTEM --custom-steps ~/public/partitioning.yml -s ./g5k_deploy/run_swift.sh | & sed "s/^/  /"
+echo $SWIFT_HOSTS | kadeploy3 -f - -a ~/public/swift_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml -s ./g5k_deploy/run_swift.sh | & sed "s/^/  /"
 
 
 echo "Waiting for Openwhisk instances to be up and running..."

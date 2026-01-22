@@ -28,7 +28,7 @@ case $TRAVIS_KUBE_VERSION in
 esac
 
 # Boot cluster
-kind create cluster --config "$SCRIPTDIR/kind-cluster.yaml" --name kind --image kindest/node:${KIND_NODE_TAG} --wait 10m || exit 1
+kind create cluster --config "$SCRIPTDIR/kind-cluster.yml" --name kind --image kindest/node:${KIND_NODE_TAG} --wait 10m || exit 1
 
 echo "Kubernetes cluster is deployed and reachable"
 kubectl describe nodes
