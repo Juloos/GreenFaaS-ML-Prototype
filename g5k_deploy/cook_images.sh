@@ -20,7 +20,7 @@ ssh root@$HOST <<-EOF |& sed "s/^/  /"
   echo -e "\nUpdating system and installing dependencies"
   apt update -y |& sed "s/^/  /"
   apt upgrade -y |& sed "s/^/  /"
-  apt remove -y $(ssh root@HOST 'dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc 2>/dev/null | cut -f1') |& sed "s/^/  /"
+  apt remove -y $(ssh root@$HOST 'dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc 2>/dev/null | cut -f1') |& sed "s/^/  /"
   apt update -y |& sed "s/^/  /"
   apt install -y ca-certificates curl |& sed "s/^/  /"
 
@@ -31,7 +31,7 @@ ssh root@$HOST <<-EOF |& sed "s/^/  /"
   tee /etc/apt/sources.list.d/docker.sources <<-"  EOF2" |& sed "s/^/  /"
     Types: deb
     URIs: https://download.docker.com/linux/ubuntu
-    Suites: $(ssh root@HOST '. /etc/os-release && echo -e "${UBUNTU_CODENAME:-$VERSION_CODENAME}"')
+    Suites: $(ssh root@$HOST '. /etc/os-release && echo -e "${UBUNTU_CODENAME:-$VERSION_CODENAME}"')
     Components: stable
     Signed-By: /etc/apt/keyrings/docker.asc
   EOF2
@@ -51,13 +51,13 @@ ssh root@$HOST "docker system prune -af" |& sed "s/^/  /"
 
 
 echo -e "\nPreparing OpenWhisk environment"
-ssh root@$HOST <<-'EOF' |& sed "s/^/  /"
+ssh root@$HOST <<-EOF |& sed "s/^/  /"
   echo -e "\nInstalling dependencies"
   apt install -y apt-transport-https gnupg gpg git |& sed "s/^/  /"
   
   echo -e "\nInstalling Kind v0.11.1"
-  [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64 |& sed "s/^/  /"
-  [ $(uname -m) = aarch64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-arm64 |& sed "s/^/  /"
+  [ \$(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64 |& sed "s/^/  /"
+  [ \$(uname -m) = aarch64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-arm64 |& sed "s/^/  /"
   chmod +x ./kind |& sed "s/^/  /"
   mv ./kind /usr/bin/kind |& sed "s/^/  /"
 
