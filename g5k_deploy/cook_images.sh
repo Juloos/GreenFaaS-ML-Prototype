@@ -4,6 +4,14 @@
 #OAR -l host=1,walltime=2:00:00
 #OAR -p wattmeter=YES
 
+cd ~/greenfaas
+git pull > /dev/null 2>&1 || {
+  git reset --hard
+  git pull
+  bash $0
+  exit $?
+}
+
 
 cd "$(dirname "$0")"
 
@@ -50,10 +58,10 @@ tgz-g5k -m $HOST -f ~/public/docker_swift_$(ssh root@$HOST "uname -m").tar.zst |
 ssh root@$HOST "docker system prune -af" |& sed "s/^/  /"
 
 
-echo -e "\nPreparing OpenWhisk environment"
+echo -e "\nPreparing Openwhisk environment"
 ssh root@$HOST <<-EOF |& sed "s/^/  /"
   echo -e "\nInstalling dependencies"
-  apt install -y apt-transport-https gnupg gpg git |& sed "s/^/  /"
+  apt install -y apt-transport-https gnupg gpg git python3-swiftclient |& sed "s/^/  /"
   
   echo -e "\nInstalling Kind v0.11.1"
   [ \$(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64 |& sed "s/^/  /"
@@ -75,7 +83,8 @@ ssh root@$HOST <<-EOF |& sed "s/^/  /"
   apt install -y helm=3.19.2-1 |& sed "s/^/  /"
 
   echo -e "\nCloning the git repo"
-  git clone "https://github.com/Juloos/GreenFaaS-ML-Prototype" --branch "NoML-Energy-Monitoring" "ow_g5k" |& sed "s/^/  /"
+  git clone "https://github.com/Juloos/GreenFaaS-ML-Prototype" --branch "NoML-Energy-Monitoring" "greenfaas" |& sed "s/^/  /"
+  cp -r greenfaas/bin/* /usr/bin/ |& sed "s/^/  /"
 
   echo -e "\nCleaning up"
   apt autoremove -y |& sed "s/^/  /"

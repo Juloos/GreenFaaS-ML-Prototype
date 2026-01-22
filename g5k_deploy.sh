@@ -1,9 +1,15 @@
 #!/bin/bash
 
+cd ~/greenfaas
+git pull > /dev/null 2>&1 || {
+  git reset --hard
+  git pull
+  bash $0
+  exit $?
+}
+
+
 cd "$(dirname "$0")"
-
-
-#TODO: deploy ow and swift seperately with the cooked images
 
 
 if [ -z "$1" ]; then
@@ -16,49 +22,48 @@ fi
 HOSTS=`oarprint host | cut -d '.' -f 1 | tr -s '\n' ' '`
 OW_HOSTS=`echo $HOSTS | cut -d ' ' -f 1-$N_OW_HOSTS`
 SWIFT_HOSTS=`echo $HOSTS | cut -d ' ' -f $(($N_OW_HOSTS + 1))-`
-echo "Using OpenWhisk hosts: $OW_HOSTS"
-echo "Using Swift hosts: $SWIFT_HOSTS"
 
 
-if [ -z "$1" ] || [ "$1" = "false" ]; then
-  echo "Deploying on $HOSTS"
-  kadeploy3 -a openwhisk_env.yaml
-fi
+echo "Deploying Openwhisk on $OW_HOSTS"
+echo $OW_HOSTS | kadeploy3 -f - -a ~/public/openwhisk_env.yaml -s ./g5k_deploy/run_openwhisk.sh | & sed "s/^/  /"
 
-echo "Updating git..."
-for HOST in $HOSTS; do
-  echo "  on $HOST"
-  ssh root@$HOST "cd GreenFaaS-ML-Prototype ; git checkout NoML-Energy-Monitoring ; git pull" >/dev/null 2>&1
+echo "Deploying Swift on $SWIFT_HOSTS"
+echo $SWIFT_HOSTS | kadeploy3 -f - -a ~/public/swift_env.yaml -s ./g5k_deploy/run_swift.sh | & sed "s/^/  /"
+
+
+echo "Waiting for Openwhisk instances to be up and running..."
+sleep 5m
+TMP_OW_HOSTS=$OW_HOSTS
+while [ -n "$TMP_OW_HOSTS" ]; do
+  for HOST in $TMP_OW_HOSTS; do
+    ./bin/wsk -i --apihost "$HOST:31001" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP" list >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+      echo "  on $HOST: up"
+      TMP_OW_HOSTS=${TMP_OW_HOSTS//$HOST/}
+    fi
+  done
+  sleep 1s
 done
 
-echo "Launching OpenWhisk..."
-for HOST in $HOSTS; do
-  echo "  on $HOST"
-  ssh root@$HOST "nohup ./GreenFaaS-ML-Prototype/run_openwhisk.sh </dev/null &" >/dev/null 2>&1 &
-done
 
-echo "Waiting a bit to make sure everything is up and running..."
-sleep 1m
-
-IPV4=`cat .ipv4`
 ITERATIONS=`cat .iterations`
-echo "Using ipv4=$IPV4, iterations=$ITERATIONS"
+RUNS=`cat .runs`
 
 mkdir -p logs
 echo "Deploying the demo..."
 for HOST in $HOSTS; do
   echo "  on $HOST"
-  ssh root@$HOST "./GreenFaaS-ML-Prototype/run_text2speech.sh '$IPV4' '$ITERATIONS' >tts.log 2>&1" >/dev/null 2>&1 && \
-    scp -r root@$HOST:/root/GreenFaaS-ML-Prototype/energy_results . && \
+  ssh root@$HOST "./greenfaas/run_text2speech.sh '`echo $SWIFT_HOSTS | sed \"s/ /,/g\"`' '$ITERATIONS' '$RUNS' >tts.log 2>&1" >/dev/null 2>&1 && \
+    scp -r root@$HOST:/root/greenfaas/energy_results . && \
     scp root@$HOST:/root/tts.log logs/$HOST.log &
 done
 
-echo "Waiting for all hosts to finish..."
-while [ -n "$HOSTS" ]; do
-  for HOST in $HOSTS; do
+echo "Waiting for tasks to finish..."
+while [ -n "$OW_HOSTS" ]; do
+  for HOST in $OW_HOSTS; do
     if [ -f "logs/$HOST.log" ]; then
       echo "  on $HOST: done"
-      HOSTS=${HOSTS//$HOST/}
+      OW_HOSTS=${OW_HOSTS//$HOST/}
     fi
   done
   sleep 10s

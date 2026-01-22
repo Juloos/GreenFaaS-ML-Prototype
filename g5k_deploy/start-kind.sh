@@ -4,6 +4,15 @@
 #     https://github.com/apache/openwhisk-deploy-kube?tab=Apache-2.0-1-ov-file
 #
 
+cd ~/greenfaas
+git pull > /dev/null 2>&1 || {
+  git reset --hard
+  git pull
+  bash $0
+  exit $?
+}
+
+
 set -x
 
 SCRIPTDIR=$(cd $(dirname "$0") && pwd)

@@ -1,7 +1,7 @@
 # GreenFaaS ML Prototype
 Testing whether it is viable to estimate the energy consumption of a faas workload using machine learning model on the initial request.
 
-Run OpenWhisk with
+Run Openwhisk with
 
     $ ./run_openwhisk.sh
 
@@ -9,7 +9,7 @@ Run the demo to get energy consumption data with
 
     $ ./run_text2speech.sh
 
-Wait that OpenWhisk finished building and deploying before running the demo for accurate data.
+Wait that Openwhisk finished building and deploying before running the demo for accurate data.
 
 You can also decide to run the tests on multiple machines automatically on Grid5000 as described below.
 
@@ -40,7 +40,7 @@ The following commands will help you setup an environment file to run the energy
 
 `node:` `$ ./GreenFaaS-ML-Prototype/run_openwhisk.sh`
 
-Let the script run until it launches OpenWhisk, then stop it and exit the node.
+Let the script run until it launches Openwhisk, then stop it and exit the node.
 
 `flyon:` `$ git clone https://github.com/Juloos/GreenFaaS-ML-Prototype --branch "NoML-Energy-Monitoring" && cd GreenFaaS-ML-Prototype`
 

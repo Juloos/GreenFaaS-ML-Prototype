@@ -1,5 +1,14 @@
 #!/bin/bash
 
+cd ~/greenfaas
+git pull > /dev/null 2>&1 || {
+  git reset --hard
+  git pull
+  bash $0
+  exit $?
+}
+
+
 cd "$(dirname "$0")"
 
 if [ -z "$1" ]; then
@@ -21,9 +30,9 @@ else
   RUNS=$3
 fi
 
-./bin/wsk -i property set --apihost "https://localhost:31001" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP"
-./bin/wskdeploy -m text2speech/manifest.yaml || 
-  { echo "Failed to deploy, make sure OpenWhisk is running."; exit 1; }
+wsk -i property set --apihost "https://localhost:31001" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP"
+wskdeploy -m text2speech/manifest.yaml || 
+  { echo "Failed to deploy, make sure Openwhisk is running."; exit 1; }
 
 SCHEMAS="S1 S3 S4 S5"
 TEXTS=$(ls swift_files | grep -E "^.*\.txt$" | tr -s '\n' ' ')
@@ -57,7 +66,7 @@ for SCHEMA in $SCHEMAS; do
       echo "    for text $TEXT"
       for (( i = 0 ; i < $ITERATIONS ; i++ )); do
         echo "      iteration $i (ipv4: ${IPV4LIST[IPV4I]})"
-        ./bin/wsk -i action invoke "demo/$SCHEMA" \
+        wsk -i action invoke "demo/$SCHEMA" \
           -p ipv4 "${IPV4LIST[IPV4I]}" \
           -p schema "$SCHEMA" \
           -p text "$TEXT" \
@@ -68,7 +77,7 @@ for SCHEMA in $SCHEMAS; do
     done
     echo "  (run $run) waiting for activations to complete..."
     for ACTIVATION in $(cat activations); do
-      while ( ./bin/wsk -i activation get "$ACTIVATION" >/dev/null 2>&1 ; test $? -ne 0 ); do
+      while ( wsk -i activation get "$ACTIVATION" >/dev/null 2>&1 ; test $? -ne 0 ); do
         sleep 1s
       done
       echo "    got $ACTIVATION"
