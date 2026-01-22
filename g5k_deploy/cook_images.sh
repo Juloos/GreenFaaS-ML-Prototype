@@ -11,75 +11,76 @@ cd "$(dirname "$0")"
 HOST=`oarprint host | cut -d '.' -f 1 | head -n 1`
 
 
-echo "Deploying on $HOST"
+echo "\nDeploying on $HOST"
 kadeploy3 -m $HOST ubuntu2004-min |& sed "s/^/  /"
 
 
-echo "Installing Docker"
+echo "\nInstalling Docker"
 ssh root@$HOST <<-'EOF' |& sed "s/^/  /"
-  echo "Updating system and installing dependencies"
+  echo "\nUpdating system and installing dependencies"
   apt update -y |& sed "s/^/  /"
   apt upgrade -y |& sed "s/^/  /"
-  apt remove -y $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc | cut -f1) |& sed "s/^/  /"
+  apt remove -y $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc 2>/dev/null | cut -f1) |& sed "s/^/  /"
   apt update -y |& sed "s/^/  /"
   apt install -y ca-certificates curl |& sed "s/^/  /"
 
-  echo "Setting up Docker repository"
+  echo "\nSetting up Docker repository"
   install -m 0755 -d /etc/apt/keyrings |& sed "s/^/  /"
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc |& sed "s/^/  /"
   chmod a+r /etc/apt/keyrings/docker.asc |& sed "s/^/  /"
-  tee /etc/apt/sources.list.d/docker.sources <<-'EOF2' |& sed "s/^/  /"
+  tee /etc/apt/sources.list.d/docker.sources <<-'  EOF2' |& sed "s/^/  /"
     Types: deb
     URIs: https://download.docker.com/linux/ubuntu
-    Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+    Suites: $(. /etc/os-release && echo "\n${UBUNTU_CODENAME:-$VERSION_CODENAME}")
     Components: stable
     Signed-By: /etc/apt/keyrings/docker.asc
   EOF2
 
-  echo "Installing Docker Engine"
-  apt update -y && apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin |& sed "s/^/  /"
+  echo "\nInstalling Docker Engine"
+  apt update -y |& sed "s/^/  /"
+  apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin |& sed "s/^/  /"
   apt autoremove -y |& sed "s/^/  /"
   apt clean |& sed "s/^/  /"
 EOF
 
 
-echo "Preparing Swift environment"
+echo "\nPreparing Swift environment"
 ssh root@$HOST "docker pull openstackswift/saio" |& sed "s/^/  /"
 tgz-g5k -m $HOST -f ~/public/docker_swift_$(ssh root@$HOST "uname -m").tar.zst |& sed "s/^/  /"
 ssh root@$HOST "docker system prune -af" |& sed "s/^/  /"
 
 
-echo "Preparing OpenWhisk environment"
+echo "\nPreparing OpenWhisk environment"
 ssh root@$HOST <<-'EOF' |& sed "s/^/  /"
-  echo "Installing dependencies"
+  echo "\nInstalling dependencies"
   apt install -y apt-transport-https gnupg gpg git |& sed "s/^/  /"
   
-  echo "Installing Kind v0.11.1"
+  echo "\nInstalling Kind v0.11.1"
   [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-amd64 |& sed "s/^/  /"
   [ $(uname -m) = aarch64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.11.1/kind-linux-arm64 |& sed "s/^/  /"
   chmod +x ./kind |& sed "s/^/  /"
   mv ./kind /usr/bin/kind |& sed "s/^/  /"
 
-  echo "Installing Kubernetes v1.31.14"
-  curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.35/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-  echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31.14/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list
+  echo "\nInstalling Kubernetes v1.31.14"
+  curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg |& sed "s/^/  /"
+  echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /' | tee /etc/apt/sources.list.d/kubernetes.list |& sed "s/^/  /"
   chmod 644 /etc/apt/sources.list.d/kubernetes.list |& sed "s/^/  /"
   apt update -y |& sed "s/^/  /"
-  apt install -y kubeadm=1.31.14-00 kubectl=1.31.14-00 kubelet=1.31.14-00 |& sed "s/^/  /"
+  apt install -y kubeadm kubectl kubelet |& sed "s/^/  /"
   
-  echo "Installing Helm v3.19.2"
+  echo "\nInstalling Helm v3.19.2"
   curl -fsSL https://packages.buildkite.com/helm-linux/helm-debian/gpgkey | gpg --dearmor | tee /usr/share/keyrings/helm.gpg > /dev/null |& sed "s/^/  /"
-  echo "deb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main" | tee /etc/apt/sources.list.d/helm-stable-debian.list |& sed "s/^/  /"
+  echo "\ndeb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main" | tee /etc/apt/sources.list.d/helm-stable-debian.list |& sed "s/^/  /"
   apt update -y |& sed "s/^/  /"
   apt install -y helm=3.19.2-1 |& sed "s/^/  /"
 
-  echo "Cloning the git repo"
+  echo "\nCloning the git repo"
   git clone $(git config --get remote.origin.url) --branch $(git branch --show-current) 'ow_g5k' |& sed "s/^/  /"
 
-  echo "Cleaning up"
+  echo "\nCleaning up"
   apt autoremove -y |& sed "s/^/  /"
   apt clean |& sed "s/^/  /"
 EOF
 tgz-g5k -m $HOST -f ~/public/openwhisk_kube_$(ssh root@$HOST "uname -m").tar.zst |& sed "s/^/  /"
 
-echo "Done.
+echo "\nDone."
