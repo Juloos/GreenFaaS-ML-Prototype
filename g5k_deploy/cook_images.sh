@@ -20,7 +20,7 @@ ssh root@$HOST <<-EOF |& sed "s/^/  /"
   echo -e "\nUpdating system and installing dependencies"
   apt update -y |& sed "s/^/  /"
   apt upgrade -y |& sed "s/^/  /"
-  apt remove -y \\\$(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc 2>/dev/null | cut -f1) |& sed "s/^/  /"
+  apt remove -y $(ssh root@HOST 'dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc 2>/dev/null | cut -f1') |& sed "s/^/  /"
   apt update -y |& sed "s/^/  /"
   apt install -y ca-certificates curl |& sed "s/^/  /"
 
