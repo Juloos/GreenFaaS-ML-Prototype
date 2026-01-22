@@ -17,12 +17,7 @@ git pull > /dev/null 2>&1 || {
 cd "$(dirname "$0")"
 
 
-if [ -z "$1" ]; then
-  N_OW_HOSTS=1
-else
-  N_OW_HOSTS=$1
-fi
-
+N_OW_HOSTS=`cat .openwhisk_instances`
 
 HOSTS=`oarprint host | cut -d '.' -f 1 | tr -s '\n' ' '`
 OW_HOSTS=`echo $HOSTS | cut -d ' ' -f 1-$N_OW_HOSTS`
