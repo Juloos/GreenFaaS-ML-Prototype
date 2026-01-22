@@ -16,31 +16,31 @@ kadeploy3 -m $HOST ubuntu2004-min |& sed "s/^/  /"
 
 
 echo -e "\nInstalling Docker"
-ssh root@$HOST <<-EOF |& sed "s/^/  /"
-  echo -e "\nUpdating system and installing dependencies"
-  apt update -y |& sed "s/^/  /"
-  apt upgrade -y |& sed "s/^/  /"
-  apt remove -y $(ssh root@$HOST 'dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc 2>/dev/null | cut -f1') |& sed "s/^/  /"
-  apt update -y |& sed "s/^/  /"
-  apt install -y ca-certificates curl |& sed "s/^/  /"
+ssh root@$HOST <<"EOF" |& sed "s/^/  /"
+echo -e "\nUpdating system and installing dependencies"
+apt update -y |& sed "s/^/  /"
+apt upgrade -y |& sed "s/^/  /"
+apt remove -y $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc 2>/dev/null | cut -f1) |& sed "s/^/  /"
+apt update -y |& sed "s/^/  /"
+apt install -y ca-certificates curl |& sed "s/^/  /"
 
-  echo -e "\nSetting up Docker repository"
-  install -m 0755 -d /etc/apt/keyrings |& sed "s/^/  /"
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc |& sed "s/^/  /"
-  chmod a+r /etc/apt/keyrings/docker.asc |& sed "s/^/  /"
-  tee /etc/apt/sources.list.d/docker.sources <<-"  EOF2" |& sed "s/^/  /"
-    Types: deb
-    URIs: https://download.docker.com/linux/ubuntu
-    Suites: $(ssh root@$HOST '. /etc/os-release && echo -e "${UBUNTU_CODENAME:-$VERSION_CODENAME}"')
-    Components: stable
-    Signed-By: /etc/apt/keyrings/docker.asc
-  EOF2
+echo -e "\nSetting up Docker repository"
+install -m 0755 -d /etc/apt/keyrings |& sed "s/^/  /"
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc |& sed "s/^/  /"
+chmod a+r /etc/apt/keyrings/docker.asc |& sed "s/^/  /"
+tee /etc/apt/sources.list.d/docker.sources <<EOF2 |& sed "s/^/  /"
+Types: deb
+URIs: https://download.docker.com/linux/ubuntu
+Suites: $(. /etc/os-release && echo -e "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
+Components: stable
+Signed-By: /etc/apt/keyrings/docker.asc
+EOF2
 
-  echo -e "\nInstalling Docker Engine"
-  apt update -y |& sed "s/^/  /"
-  apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin |& sed "s/^/  /"
-  apt autoremove -y |& sed "s/^/  /"
-  apt clean |& sed "s/^/  /"
+echo -e "\nInstalling Docker Engine"
+apt update -y |& sed "s/^/  /"
+apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin |& sed "s/^/  /"
+apt autoremove -y |& sed "s/^/  /"
+apt clean |& sed "s/^/  /"
 EOF
 
 
