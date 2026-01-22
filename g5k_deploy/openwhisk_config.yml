@@ -1,0 +1,60 @@
+whisk:
+  ingress:
+    type: NodePort
+    apiHostName: 172.17.0.1
+    apiHostPort: 31001
+    apiHostProto: "https"
+    useInternally: false
+  containerPool:
+    userMemory: "16g"
+  loadbalancer:
+    blackboxFraction: "100%"
+  limits:
+    actionsInvokesPerminute: 1000
+    actionsInvokesConcurrent: 1000
+    triggersFiresPerminute: 1000
+    actionsSequenceMaxlength: 1000
+    actions:
+      time:
+        min: "100ms"
+        max: "10m"
+        std: "10m"
+  versions:
+    openwhisk:
+      buildDate: "2022-06-23-06:18:00Z"
+      buildNo: "20220623a"
+      gitTag: "c5970a657a3070e9964cb14715b9df31819d3b75"
+
+utility:
+  imageTag: "c5970a6"
+
+controller:
+  imageTag: "c5970a6"
+
+user_events:
+  imageTag: "c5970a6"
+
+nginx:
+  httpsNodePort: 31001
+
+# disable affinity
+affinity:
+  enabled: false
+
+toleration:
+  enabled: false
+
+invoker:
+  imageTag: "c5970a6"
+  options: "-Dwhisk.kubernetes.user-pod-node-affinity.enabled=false"
+  jvmHeapMB: "2048"
+  loglevel: "ERROR"
+  # must use KCF as kind uses containerd as its container runtime
+  containerFactory:
+    impl: "kubernetes"
+    kubernetes:
+      replicaCount: 1
+
+k8s:
+  persistence:
+    enabled: false

@@ -20,10 +20,8 @@ for hostname in HOSTS:
 
     with open("%s.csv" % hostname, "w") as fout:
         csv_writer = csv.writer(fout)
-        csv_writer.writerow(["schema", "text", "joules", "milliseconds"])
+        csv_writer.writerow(["schema", "watts", "joules", "milliseconds"])
         for schema in SCHEMAS:
-            total = 0
-            milliseconds = 0
             with open("%s/%s.json" % (hostname, schema), "r") as fin:
                 data = json.load(fin)
             try:
@@ -35,6 +33,7 @@ for hostname in HOSTS:
                 start = datetime.datetime.strptime(data[0]["timestamp"], "%Y-%m-%dT%H:%M:%S%z")
                 end = datetime.datetime.strptime(data[-1]["timestamp"], "%Y-%m-%dT%H:%M:%S%z")
             host_milliseconds = (end - start).total_seconds() * 1000
-            host_total = sum((float(d["value"]) - idle_watts_of[hostname]) for d in data) * timechunkms / host_milliseconds
-            print(f"{hostname}/{schema} : {host_total}J | {host_milliseconds}ms")
-            csv_writer.writerow([schema, total, milliseconds])
+            host_watts = sum((float(d["value"]) - idle_watts_of[hostname]) for d in data)
+            host_joules = host_watts * timechunkms / host_milliseconds
+            print(f"{hostname}/{schema} : {host_joules}J | {host_milliseconds}ms")
+            csv_writer.writerow([schema, host_watts, host_joules, host_milliseconds])

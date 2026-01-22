@@ -1,0 +1,4 @@
+mklabel gpt
+mkpart KDPL_SYSTEM_disk0 ext4 0% 100%
+toggle 1 boot
+align-check optimal 1

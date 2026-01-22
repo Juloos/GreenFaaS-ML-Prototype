@@ -2,7 +2,23 @@
 
 cd "$(dirname "$0")"
 
+
+#TODO: deploy ow and swift seperately with the cooked images
+
+
+if [ -z "$1" ]; then
+  N_OW_HOSTS=1
+else
+  N_OW_HOSTS=$1
+fi
+
+
 HOSTS=`oarprint host | cut -d '.' -f 1 | tr -s '\n' ' '`
+OW_HOSTS=`echo $HOSTS | cut -d ' ' -f 1-$N_OW_HOSTS`
+SWIFT_HOSTS=`echo $HOSTS | cut -d ' ' -f $(($N_OW_HOSTS + 1))-`
+echo "Using OpenWhisk hosts: $OW_HOSTS"
+echo "Using Swift hosts: $SWIFT_HOSTS"
+
 
 if [ -z "$1" ] || [ "$1" = "false" ]; then
   echo "Deploying on $HOSTS"
