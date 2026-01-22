@@ -16,7 +16,7 @@ kadeploy3 -m $HOST ubuntu2004-min |& sed "s/^/  /"
 
 
 echo -e "\nInstalling Docker"
-ssh root@$HOST <<-'EOF' |& sed "s/^/  /"
+ssh root@$HOST <<-"EOF" |& sed "s/^/  /"
   echo -e "\nUpdating system and installing dependencies"
   apt update -y |& sed "s/^/  /"
   apt upgrade -y |& sed "s/^/  /"
@@ -28,7 +28,7 @@ ssh root@$HOST <<-'EOF' |& sed "s/^/  /"
   install -m 0755 -d /etc/apt/keyrings |& sed "s/^/  /"
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc |& sed "s/^/  /"
   chmod a+r /etc/apt/keyrings/docker.asc |& sed "s/^/  /"
-  tee /etc/apt/sources.list.d/docker.sources <<-'  EOF2' |& sed "s/^/  /"
+  tee /etc/apt/sources.list.d/docker.sources <<-EOF2 |& sed "s/^/  /"
     Types: deb
     URIs: https://download.docker.com/linux/ubuntu
     Suites: $(. /etc/os-release && echo -e "\n${UBUNTU_CODENAME:-$VERSION_CODENAME}")
@@ -75,7 +75,7 @@ ssh root@$HOST <<-'EOF' |& sed "s/^/  /"
   apt install -y helm=3.19.2-1 |& sed "s/^/  /"
 
   echo -e "\nCloning the git repo"
-  git clone $(git config --get remote.origin.url) --branch $(git branch --show-current) 'ow_g5k' |& sed "s/^/  /"
+  git clone "https://github.com/Juloos/GreenFaaS-ML-Prototype" --branch "NoML-Energy-Monitoring" "ow_g5k" |& sed "s/^/  /"
 
   echo -e "\nCleaning up"
   apt autoremove -y |& sed "s/^/  /"
