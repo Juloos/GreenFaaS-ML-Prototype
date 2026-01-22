@@ -25,10 +25,23 @@ SWIFT_HOSTS=`echo $HOSTS | cut -d ' ' -f $(($N_OW_HOSTS + 1))-`
 
 
 echo "Deploying Openwhisk on $OW_HOSTS"
-echo $OW_HOSTS | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml -s ./g5k_deploy/run_openwhisk.sh | & sed "s/^/  /"
+echo $OW_HOSTS | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml | & sed "s/^/  /"
+
+echo "Starting up Openwhisk..."
+for HOST in $OW_HOSTS; do
+  echo "  on $HOST"
+  ssh root@$HOST "./greenfaas/g5k_deploy/run_openwhisk.sh" &
+done
+
 
 echo "Deploying Swift on $SWIFT_HOSTS"
-echo $SWIFT_HOSTS | kadeploy3 -f - -a ~/public/swift_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml -s ./g5k_deploy/run_swift.sh | & sed "s/^/  /"
+echo $SWIFT_HOSTS | kadeploy3 -f - -a ~/public/swift_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml | & sed "s/^/  /"
+
+echo "Starting up Swift..."
+for HOST in $SWIFT_HOSTS; do
+  echo "  on $HOST"
+  ssh root@$HOST "./g5k_deploy/run_swift.sh" &
+done
 
 
 echo "Waiting for Openwhisk instances to be up and running..."
