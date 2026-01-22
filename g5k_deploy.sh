@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#OAR -p 'core_count>=12 AND memnode>=32768 AND wattmeter=YES'
+#OAR -p 'core_count=12 AND memnode=32768 AND wattmeter=YES'
 #OAR -t monitor=wattmetre_power_watt
 #OAR -t destructive
 #OAR -t deploy
