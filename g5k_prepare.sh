@@ -1,15 +1,13 @@
 #!/bin/bash
 
-cd ~/greenfaas
+
+cd "$(dirname "$0")"
 git pull > /dev/null 2>&1 || {
   git reset --hard
   git pull
   bash $0
   exit $?
 }
-
-
-cd "$(dirname "$0")"
 
 
 rm ~/public/openwhisk_kube_*.tar.zst ~/public/docker_swift_*.tar.zst
