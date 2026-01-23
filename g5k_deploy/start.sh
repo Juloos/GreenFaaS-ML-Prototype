@@ -3,7 +3,7 @@
 
 MD5="$(md5sum "$0" | cut -d ' ' -f 1)"
 SCRIPTPATH="$(realpath "$0")"
-cd "$(dirname "$SCRIPTDIR")"
+cd "$(dirname "$SCRIPTDIR")/.."
 git pull
 [ "$MD5" == "$(md5sum "$SCRIPTPATH" | cut -d ' ' -f 1)" ] || {
   bash "$SCRIPTPATH"
@@ -11,7 +11,7 @@ git pull
 }
 
 
-N_OW_HOSTS=`cat ../.openwhisk_instances`
+NB_OW=`cat .openwhisk_instances`
 
 HOSTS=`oarprint host -P host,cluster,core_count,memnode,wattmeter`
 
@@ -19,6 +19,9 @@ HOSTS=`oarprint host -P host,cluster,core_count,memnode,wattmeter`
 ######################
 # Resource selection #
 ######################
+
+echo "Selecting resources from"
+echo -e "$HOSTS" | sed "s/^/  /"
 
 mapfile -t OW_ELIGIBLE < <(
   echo -e $HOSTS | awk '$3 >= 12 && $4 >= 16384 && $5 == "YES"'
@@ -31,11 +34,11 @@ for line in "${OW_ELIGIBLE[@]}"; do
   CLUSTERS["$cluster"]+="$host "
 done
 
-# Find a cluster with at least N_OW_HOSTS eligible hosts
+# Find a cluster with at least NB_OW eligible hosts
 for cluster in "${!CLUSTERS[@]}"; do
   hosts=(${CLUSTERS[$cluster]})
-  if (( ${#hosts[@]} >= N_OW_HOSTS )); then
-    OW_HOSTS=("${hosts[@]:0:N_OW_HOSTS}")
+  if (( ${#hosts[@]} >= NB_OW )); then
+    OW_HOSTS=("${hosts[@]:0:NB_OW}")
     break
   fi
 done
@@ -92,8 +95,8 @@ while [ -n "$TMP_OW_HOSTS" ]; do
 done
 
 
-ITERATIONS=`cat ../.iterations`
-RUNS=`cat ../.runs`
+ITERATIONS=`cat .iterations`
+RUNS=`cat .runs`
 
 mkdir -p logs
 echo "Deploying the demo..."
