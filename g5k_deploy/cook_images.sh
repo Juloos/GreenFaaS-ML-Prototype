@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #OAR -t deploy
-#OAR -l host=1,walltime=1:00:00
+#OAR -l host=1,walltime=0:30:00
 #OAR -p wattmeter=YES
 
 cd ~/greenfaas
@@ -49,6 +49,10 @@ apt update -y |& sed "s/^/  /"
 apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin |& sed "s/^/  /"
 apt autoremove -y |& sed "s/^/  /"
 apt clean |& sed "s/^/  /"
+
+echo -e "\nCloning the git repo"
+git clone "https://github.com/Juloos/GreenFaaS-ML-Prototype" --branch "NoML-Energy-Monitoring" "greenfaas" |& sed "s/^/  /"
+cp -r greenfaas/bin/* /usr/bin/ |& sed "s/^/  /"
 EOF
 
 
@@ -81,10 +85,6 @@ ssh root@$HOST <<-EOF |& sed "s/^/  /"
   echo -e "\ndeb [signed-by=/usr/share/keyrings/helm.gpg] https://packages.buildkite.com/helm-linux/helm-debian/any/ any main" | tee /etc/apt/sources.list.d/helm-stable-debian.list |& sed "s/^/  /"
   apt update -y |& sed "s/^/  /"
   apt install -y helm=3.19.2-1 |& sed "s/^/  /"
-
-  echo -e "\nCloning the git repo"
-  git clone "https://github.com/Juloos/GreenFaaS-ML-Prototype" --branch "NoML-Energy-Monitoring" "greenfaas" |& sed "s/^/  /"
-  cp -r greenfaas/bin/* /usr/bin/ |& sed "s/^/  /"
 
   echo -e "\nCleaning up"
   apt autoremove -y |& sed "s/^/  /"
