@@ -17,7 +17,7 @@ if [ -z "$1" ]; then
   WT=4
 else
   WT=$1
-if
+fi
 
 if [ "$(echo "$WT" | cut -d ':' -f 1)" -ge 6 ]; then
   NIGHT_OR_DAY="night"
