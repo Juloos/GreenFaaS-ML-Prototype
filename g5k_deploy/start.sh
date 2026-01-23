@@ -24,7 +24,7 @@ mapfile -t HOSTS < <(
 
 echo "Selecting resources from"
 echo "  host cluster core_count memnode wattmeter"
-printf '%s\n' "${HOSTS[@]}" | sed "s/^/  /"
+printf '  %s\n' "${HOSTS[@]}"
 echo "With"
 echo "  NB_OW=$NB_OW"
 
@@ -71,7 +71,7 @@ echo $OW_HOSTS | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p SYSTEM --custom
 echo "Starting up Openwhisk..."
 for HOST in $OW_HOSTS; do
   echo "  on $HOST"
-  ssh root@$HOST "./greenfaas/g5k_deploy/run_openwhisk.sh" &
+  ssh root@$HOST "./greenfaas/g5k_deploy/run_openwhisk.sh" >/dev/null 2>&1 &
 done
 
 
@@ -81,7 +81,7 @@ echo $SWIFT_HOSTS | kadeploy3 -f - -a ~/public/swift_env.yml -p SYSTEM --custom-
 echo "Starting up Swift..."
 for HOST in $SWIFT_HOSTS; do
   echo "  on $HOST"
-  ssh root@$HOST "./greenfaas/g5k_deploy/run_swift.sh" &
+  ssh root@$HOST "./greenfaas/g5k_deploy/run_swift.sh" >/dev/null 2>&1 &
 done
 
 
@@ -107,7 +107,7 @@ mkdir -p logs
 echo "Deploying the demo..."
 for HOST in $OW_HOSTS; do
   echo "  on $HOST"
-  ssh root@$HOST "./greenfaas/run_text2speech.sh '`echo $SWIFT_HOSTS | sed \"s/ /,/g\"`' '$ITERATIONS' '$RUNS' >tts.log 2>&1" >/dev/null 2>&1 && \
+  ssh root@$HOST "./greenfaas/run_text2speech.sh '$(echo $SWIFT_HOSTS | sed "s/ /,/g")' '$ITERATIONS' '$RUNS' >tts.log 2>&1" >/dev/null 2>&1 && \
     scp -r root@$HOST:/root/greenfaas/energy_results . && \
     scp root@$HOST:/root/tts.log logs/$HOST.log &
 done
