@@ -23,8 +23,8 @@ HOSTS=`oarprint host -P host,cluster,core_count,memnode,wattmeter`
 echo "Selecting resources from"
 echo "  host cluster core_count memnode wattmeter"
 echo -e "$HOSTS" | sed "s/^/  /"
-echo "With env"
-env | sed "s/^/  /"
+echo "With NB_OW=$NB_OW"
+echo "     PWD=$PWD"
 
 mapfile -t OW_ELIGIBLE < <(
   echo -e $HOSTS | awk '$3 >= 12 && $4 >= 16384 && $5 == "YES"'
