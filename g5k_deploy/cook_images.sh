@@ -4,16 +4,13 @@
 #OAR -l host=1,walltime=0:30:00
 #OAR -p wattmeter=YES
 
-cd ~/greenfaas
+cd "$(dirname "$0")"
 git pull > /dev/null 2>&1 || {
   git reset --hard
   git pull
   bash $0
   exit $?
 }
-
-
-cd "$(dirname "$0")"
 
 
 HOST=`oarprint host | cut -d '.' -f 1 | head -n 1`

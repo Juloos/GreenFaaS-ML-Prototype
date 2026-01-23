@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd ~/greenfaas
+cd "$(dirname "$0")"
 git pull > /dev/null 2>&1 || {
   git reset --hard
   git pull
@@ -8,8 +8,6 @@ git pull > /dev/null 2>&1 || {
   exit $?
 }
 
-
-cd "$(dirname "$0")"
 
 if [ -z "$1" ]; then
   echo "Usage: $0 <ipv4s> [<iterations>] [<runs>]"
