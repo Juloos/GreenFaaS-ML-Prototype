@@ -17,8 +17,6 @@ git pull
 
 set -x
 
-SCRIPTDIR=$(cd $(dirname "$0") && pwd)
-
 TRAVIS_KUBE_VERSION=${TRAVIS_KUBE_VERSION:="v1.20"}
 
 # Map from Kubernetes major versions to the kind node image tag
@@ -30,7 +28,7 @@ case $TRAVIS_KUBE_VERSION in
 esac
 
 # Boot cluster
-kind create cluster --config "$SCRIPTDIR/kind-cluster.yml" --name kind --image kindest/node:${KIND_NODE_TAG} --wait 10m || exit 1
+kind create cluster --config "kind-cluster.yml" --name kind --image kindest/node:${KIND_NODE_TAG} --wait 10m || exit 1
 
 echo "Kubernetes cluster is deployed and reachable"
 kubectl describe nodes
