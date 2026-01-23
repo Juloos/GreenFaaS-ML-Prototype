@@ -15,7 +15,7 @@ NB_OW=`cat .openwhisk_instances`
 NB_SWIFT=`cat .swift_instances`
 
 if [ -z "$1" ]; then
-  WT=4
+  WT=2
 else
   WT=$1
 fi
