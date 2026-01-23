@@ -13,20 +13,19 @@ git pull
 
 NB_OW=`cat .openwhisk_instances`
 
-HOSTS=`oarprint host -P host,cluster,core_count,memnode,wattmeter`
-
 
 ######################
 # Resource selection #
 ######################
 
+mapfile -t HOSTS < <(
+  oarprint host -P host,cluster,core_count,memnode,wattmeter
+)
+
 echo "Selecting resources from"
 echo "  host cluster core_count memnode wattmeter"
-echo -e "$HOSTS" | sed "s/^/  /"
+echo -e $HOSTS | sed "s/^/  /"
 echo "With"
-echo "  MD5=$MD5"
-echo "  SCRIPTPATH=$SCRIPTPATH"
-echo "  PWD=$PWD"
 echo "  NB_OW=$NB_OW"
 
 mapfile -t OW_ELIGIBLE < <(
@@ -86,7 +85,7 @@ for HOST in $SWIFT_HOSTS; do
 done
 
 
-echo "Waiting for Openwhisk instances to be up and running..."
+echo "Waiting for Openwhisk to be up and running..."
 sleep 5m
 TMP_OW_HOSTS=$OW_HOSTS
 while [ -n "$TMP_OW_HOSTS" ]; do
