@@ -24,12 +24,12 @@ mapfile -t HOSTS < <(
 
 echo "Selecting resources from"
 echo "  host cluster core_count memnode wattmeter"
-IFS=$'\n' echo -e "${HOSTS[@]}" | sed "s/^/  /"
+printf '%s\n' "${HOSTS[@]}" | sed "s/^/  /"
 echo "With"
 echo "  NB_OW=$NB_OW"
 
 mapfile -t OW_ELIGIBLE < <(
-  IFS=$'\n' echo -e "${HOSTS[@]}" | awk '$3 >= 12 && $4 >= 16384 && $5 == "YES"'
+  printf '%s\n' "${HOSTS[@]}" | awk '$3 >= 12 && $4 >= 16384 && $5 == "YES"'
 )
 
 # Group OW eligible hosts by cluster
