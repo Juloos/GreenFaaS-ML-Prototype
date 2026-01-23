@@ -1,10 +1,5 @@
 #!/bin/bash
 
-#OAR -l {core_count >=12 AND memnode >= 32768 AND wattmeter=YES}
-#OAR -t monitor=wattmetre_power_watt
-#OAR -t destructive
-#OAR -t deploy
-
 
 cd ~/greenfaas
 git pull > /dev/null 2>&1 || {
@@ -18,12 +13,51 @@ git pull > /dev/null 2>&1 || {
 cd "$(dirname "$0")"
 
 
-N_OW_HOSTS=`cat .openwhisk_instances`
+N_OW_HOSTS=`cat ../.openwhisk_instances`
 
-HOSTS=`oarprint host | cut -d '.' -f 1 | tr -s '\n' ' '`
-OW_HOSTS=`echo $HOSTS | cut -d ' ' -f 1-$N_OW_HOSTS`
-SWIFT_HOSTS=`echo $HOSTS | cut -d ' ' -f $(($N_OW_HOSTS + 1))-`
+HOSTS=`oarprint host -P host,cluster,core_count,memnode,wattmeter`
 
+
+######################
+# Resource selection #
+######################
+
+mapfile -t OW_ELIGIBLE < <(
+  echo -e $HOSTS | awk '$3 >= 12 && $4 >= 16384 && $5 == "YES"'
+)
+
+# Group OW eligible hosts by cluster
+declare -A CLUSTERS
+for line in "${OW_ELIGIBLE[@]}"; do
+  read -r host cluster _ <<< "$line"
+  CLUSTERS["$cluster"]+="$host "
+done
+
+# Find a cluster with at least N_OW_HOSTS eligible hosts
+for cluster in "${!CLUSTERS[@]}"; do
+  hosts=(${CLUSTERS[$cluster]})
+  if (( ${#hosts[@]} >= N_OW_HOSTS )); then
+    OW_HOSTS=("${hosts[@]:0:N_OW_HOSTS}")
+    break
+  fi
+done
+
+# Put everything else as Swift hosts
+SWIFT_HOSTS=()
+for line in "${HOSTS[@]}"; do
+  read -r host cluster _ <<< "$line"
+  # Skip OW hosts
+  skip=false
+  for ow in "${OW_HOSTS[@]}"; do
+    [[ "$host" == "$ow" ]] && skip=true && break
+  done
+  $skip || SWIFT_HOSTS+=("$host")
+done
+
+
+###############
+# Deployemeny #
+###############
 
 echo "Deploying Openwhisk on $OW_HOSTS"
 echo $OW_HOSTS | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml | & sed "s/^/  /"
@@ -41,7 +75,7 @@ echo $SWIFT_HOSTS | kadeploy3 -f - -a ~/public/swift_env.yml -p SYSTEM --custom-
 echo "Starting up Swift..."
 for HOST in $SWIFT_HOSTS; do
   echo "  on $HOST"
-  ssh root@$HOST "./g5k_deploy/run_swift.sh" &
+  ssh root@$HOST "./greenfaas/g5k_deploy/run_swift.sh" &
 done
 
 
@@ -60,12 +94,12 @@ while [ -n "$TMP_OW_HOSTS" ]; do
 done
 
 
-ITERATIONS=`cat .iterations`
-RUNS=`cat .runs`
+ITERATIONS=`cat ../.iterations`
+RUNS=`cat ../.runs`
 
 mkdir -p logs
 echo "Deploying the demo..."
-for HOST in $HOSTS; do
+for HOST in $OW_HOSTS; do
   echo "  on $HOST"
   ssh root@$HOST "./greenfaas/run_text2speech.sh '`echo $SWIFT_HOSTS | sed \"s/ /,/g\"`' '$ITERATIONS' '$RUNS' >tts.log 2>&1" >/dev/null 2>&1 && \
     scp -r root@$HOST:/root/greenfaas/energy_results . && \
