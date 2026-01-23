@@ -1,11 +1,12 @@
 #!/bin/bash
 
 
-cd "$(dirname "$0")"
-MD5=`md5sum "$0" | cut -d ' ' -f 1`
+MD5="$(md5sum "$0" | cut -d ' ' -f 1)"
+SCRIPTPATH="$(realpath "$0")"
+cd "$(dirname "$SCRIPTDIR")"
 git pull
-[ "$MD5" == "`md5sum \"$0\" | cut -d ' ' -f 1`" ] || {
-  bash "$0"
+[ "$MD5" == "$(md5sum "$SCRIPTPATH" | cut -d ' ' -f 1)" ] || {
+  bash "$SCRIPTPATH"
   exit $?
 }
 
@@ -57,7 +58,7 @@ done
 ###############
 
 echo "Deploying Openwhisk on $OW_HOSTS"
-echo $OW_HOSTS | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml | & sed "s/^/  /"
+echo $OW_HOSTS | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml |& sed "s/^/  /"
 
 echo "Starting up Openwhisk..."
 for HOST in $OW_HOSTS; do
@@ -67,7 +68,7 @@ done
 
 
 echo "Deploying Swift on $SWIFT_HOSTS"
-echo $SWIFT_HOSTS | kadeploy3 -f - -a ~/public/swift_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml | & sed "s/^/  /"
+echo $SWIFT_HOSTS | kadeploy3 -f - -a ~/public/swift_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml |& sed "s/^/  /"
 
 echo "Starting up Swift..."
 for HOST in $SWIFT_HOSTS; do

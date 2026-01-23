@@ -4,11 +4,13 @@
 #OAR -l host=1,walltime=0:30:00
 #OAR -p wattmeter=YES
 
-cd "$(dirname "$0")"
-git pull > /dev/null 2>&1 || {
-  git reset --hard
-  git pull
-  bash $0
+
+MD5="$(md5sum "$0" | cut -d ' ' -f 1)"
+SCRIPTPATH="$(realpath "$0")"
+cd "$(dirname "$SCRIPTDIR")"
+git pull
+[ "$MD5" == "$(md5sum "$SCRIPTPATH" | cut -d ' ' -f 1)" ] || {
+  bash "$SCRIPTPATH"
   exit $?
 }
 
