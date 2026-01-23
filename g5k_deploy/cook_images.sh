@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #OAR -t deploy
-#OAR -l host=1,walltime=2:00:00
+#OAR -l host=1,walltime=1:00:00
 #OAR -p wattmeter=YES
 
 cd ~/greenfaas
