@@ -24,12 +24,12 @@ mapfile -t HOSTS < <(
 
 echo "Selecting resources from"
 echo "  host cluster core_count memnode wattmeter"
-echo -e ${HOSTS[@]} | sed "s/^/  /"
+IFS="\n" echo -e "${HOSTS[@]}" | sed "s/^/  /"
 echo "With"
 echo "  NB_OW=$NB_OW"
 
 mapfile -t OW_ELIGIBLE < <(
-  echo -e ${HOSTS[@]} | awk '$3 >= 12 && $4 >= 16384 && $5 == "YES"'
+  IFS="\n" echo -e "${HOSTS[@]}" | awk '$3 >= 12 && $4 >= 16384 && $5 == "YES"'
 )
 
 # Group OW eligible hosts by cluster
@@ -50,7 +50,7 @@ done
 
 # Put everything else as Swift hosts
 SWIFT_HOSTS=()
-for line in ${HOSTS[@]}; do
+for line in "${HOSTS[@]}"; do
   read -r host cluster _ <<< "$line"
   # Skip OW hosts
   skip=false
