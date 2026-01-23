@@ -2,10 +2,10 @@
 
 
 cd "$(dirname "$0")"
-git pull > /dev/null 2>&1 || {
-  git reset --hard
-  git pull
-  bash $0
+MD5=`md5sum "$0" | cut -d ' ' -f 1`
+git pull
+[ "$MD5" == "`md5sum \"$0\" | cut -d ' ' -f 1`" ] && {
+  bash "$0"
   exit $?
 }
 

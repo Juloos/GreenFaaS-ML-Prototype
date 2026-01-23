@@ -4,11 +4,11 @@
 #     https://github.com/apache/openwhisk-deploy-kube?tab=Apache-2.0-1-ov-file
 #
 
-cd ~/greenfaas
-git pull > /dev/null 2>&1 || {
-  git reset --hard
-  git pull
-  bash $0
+cd "$(dirname "$0")"
+MD5=`md5sum "$0" | cut -d ' ' -f 1`
+git pull
+[ "$MD5" == "`md5sum \"$0\" | cut -d ' ' -f 1`" ] && {
+  bash "$0"
   exit $?
 }
 
