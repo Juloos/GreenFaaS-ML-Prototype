@@ -71,7 +71,7 @@ echo $OW_HOSTS | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p SYSTEM --custom
 echo "Starting up Openwhisk..."
 for HOST in $OW_HOSTS; do
   echo "  on $HOST"
-  ssh root@$HOST "./greenfaas/g5k_deploy/run_openwhisk.sh" >/dev/null 2>&1 &
+  ssh root@$HOST "./greenfaas/g5k_deploy/run_openwhisk.sh >openwhisk.stdout 2>openwhisk.stderr" >/dev/null 2>&1 &
 done
 
 
@@ -81,7 +81,7 @@ echo $SWIFT_HOSTS | kadeploy3 -f - -a ~/public/swift_env.yml -p SYSTEM --custom-
 echo "Starting up Swift..."
 for HOST in $SWIFT_HOSTS; do
   echo "  on $HOST"
-  ssh root@$HOST "./greenfaas/g5k_deploy/run_swift.sh" >/dev/null 2>&1 &
+  ssh root@$HOST "./greenfaas/g5k_deploy/run_swift.sh >swift.stdout 2>swift.stderr" >/dev/null 2>&1 &
 done
 
 
