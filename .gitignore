@@ -2,3 +2,4 @@ decision_tree/__pycache__/
 **/*.log
 energy_results/*.csv
 energy_results/*/
+.vscode/

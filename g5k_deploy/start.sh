@@ -61,9 +61,9 @@ for line in "${HOSTS[@]}"; do
 done
 
 
-###############
-# Deployemeny #
-###############
+##############
+# Deployment #
+##############
 
 echo "Deploying Openwhisk on $OW_HOSTS"
 echo $OW_HOSTS | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml |& sed "s/^/  /"
