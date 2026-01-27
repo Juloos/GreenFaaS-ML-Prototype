@@ -11,6 +11,7 @@ def start(action, args, result, lock):
         for port in ["31001", "3233"]:
             try:
                 req = requests.post(f"https://{host}:{port}/api/v1/namespaces/_/actions/demo/{action}", auth=auth, json=args, verify=False).json()
+                print("Invoked action:", req)
                 activation_id = req.get("activationId", "")
                 if activation_id == "":
                     break
