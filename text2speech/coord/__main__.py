@@ -24,7 +24,7 @@ def start(action, args, result, lock):
     if res is not None:
         print(res.text)
         with lock:
-            result.update(r.json())  
+            result.update(res.json())  
 
      
 def main(args):
