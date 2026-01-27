@@ -10,11 +10,13 @@ def start(action, args, result, lock):
     for host in ["172.17.0.1", "host.docker.internal"]:
         for port in ["31001", "3233"]:
             try:
-                req = requests.get(f"https://{host}:{port}/api/v1/web/guest/demo/{action}", headers={"Content-Type": "application/json"}, params=args, verify=False).json()
+                req = requests.post(f"https://{host}:{port}/api/v1/namespaces/_/actions/demo/{action}", auth=auth, json=args, verify=False).json()
                 activation_id = req.get("activationId", "")
+                if activation_id == "":
+                    break
                 for _ in range(60):
                     try:
-                        res = requests.get(f"https://{host}:{port}/api/v1/namespaces/_/activations/{activation_id}/result", headers={"Content-Type": "application/json"}, auth=auth, timeout=10, verify=False)
+                        res = requests.get(f"https://{host}:{port}/api/v1/namespaces/_/activations/{activation_id}/result", auth=auth, timeout=10, verify=False)
                         if res.status_code != 200:
                             continue
                     except requests.exceptions.Timeout:
