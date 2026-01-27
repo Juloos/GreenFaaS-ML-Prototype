@@ -1,10 +1,11 @@
 import sys
 import requests
+from requests.auth import HTTPBasicAuth
 from multiprocessing import Process, Manager, Lock
 
 
 def start(action, args, result, lock):
-    auth="23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP"
+    auth=HTTPBasicAuth("23bc46b1-71f6-4ed5-8c54-816aa4f8c502", "123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP")
     res = None
     for host in ["172.17.0.1", "host.docker.internal"]:
         for port in ["31001", "3233"]:
