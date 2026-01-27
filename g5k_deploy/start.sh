@@ -107,8 +107,8 @@ mkdir -p logs
 echo "Deploying the demo..."
 for HOST in $OW_HOSTS; do
   echo "  on $HOST"
-  ssh root@$HOST "./greenfaas/g5k_deploy/run_text2speech.sh '$(echo $SWIFT_HOSTS | sed "s/ /,/g")' '$ITERATIONS' '$RUNS' >tts.log 2>&1" >/dev/null 2>&1 && \
-    scp -r root@$HOST:/root/greenfaas/energy_results . && \
+  ssh root@$HOST "./greenfaas/g5k_deploy/run_text2speech.sh '$(echo $SWIFT_HOSTS | sed "s/ /,/g")' '$ITERATIONS' '$RUNS' >tts.log 2>&1" >/dev/null 2>&1 &&
+    scp -r root@$HOST:/root/greenfaas/energy_results . &&
     scp root@$HOST:/root/tts.log logs/$HOST.log &
 done
 

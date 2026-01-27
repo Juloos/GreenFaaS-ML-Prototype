@@ -47,6 +47,28 @@ for IPV4 in ${IPV4LIST[@]}; do
   swift upload "whiskcontainer" swift_files --object-name "." --skip-identical -A "http://$IPV4:8080/auth/v1.0" -U "test:tester" -K "testing"
 done
 
+echo Warming up...
+rm -f activations
+for IPV4 in ${IPV4LIST[@]}; do
+  echo "  ipv4 $IPV4"
+  for SCHEMA in $SCHEMAS; do
+    echo "    schema $SCHEMA"
+    wsk -i action invoke "demo/$SCHEMA" \
+      -p ipv4 "$IPV4" \
+      -p schema "$SCHEMA" \
+      -p text "${TEXTS[0]}" \
+      -p ttsid "$HOSTNAME-$SCHEMA-warmup" \
+    | cut -d ' ' -f 6 >>activations
+  done
+done
+echo "(warmup) waiting for activations to complete..."
+for ACTIVATION in $(cat activations); do
+  while ( wsk -i activation get "$ACTIVATION" >/dev/null 2>&1 ; test $? -ne 0 ); do
+    sleep 1s
+  done
+  echo "  got $ACTIVATION"
+done
+
 echo Waiting 1m...
 start=$(date +%FT%T)
 sleep 1m

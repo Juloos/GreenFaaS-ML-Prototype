@@ -4,19 +4,25 @@ from multiprocessing import Process, Manager, Lock
 
 
 def start(action, args, result, lock):
-
-    apihost = f"https://%s:%s/api/v1/web/guest/demo/{action}?blocking=true&result=true"
     
-    r = None
+    res = None
     for host in ["172.17.0.1", "host.docker.internal"]:
         for port in ["31001", "3233"]:
             try:
-                r = requests.get(apihost % (host, port), headers={"Content-Type": "application/json"}, params=args, verify=False)
+                req = requests.get(f"https://{host}:{port}/api/v1/web/guest/demo/{action}", headers={"Content-Type": "application/json"}, params=args, verify=False).json()
+                activation_id = req.get("activationId", "")
+                for _ in range(60):
+                    try:
+                        res = requests.get(f"https://{host}:{port}/api/v1/namespaces/_/activations/{activation_id}/result", headers={"Content-Type": "application/json"}, timeout=10, verify=False)
+                        if res.status_code != 200:
+                            continue
+                    except requests.exceptions.Timeout:
+                        continue
                 break
             except requests.exceptions.ConnectionError:
                 continue
-    if r is not None:
-        print(r.text)
+    if res is not None:
+        print(res.text)
         with lock:
             result.update(r.json())  
 
