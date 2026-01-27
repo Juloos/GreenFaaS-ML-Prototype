@@ -2,6 +2,7 @@ import sys
 import requests
 from requests.auth import HTTPBasicAuth
 from multiprocessing import Process, Manager, Lock
+from time import sleep
 
 
 def start(action, args, result, lock):
@@ -19,6 +20,7 @@ def start(action, args, result, lock):
                     try:
                         res = requests.get(f"https://{host}:{port}/api/v1/namespaces/_/activations/{activation_id}/result", auth=auth, timeout=10, verify=False)
                         if res.status_code != 200:
+                            sleep(10)
                             continue
                     except requests.exceptions.Timeout:
                         continue
