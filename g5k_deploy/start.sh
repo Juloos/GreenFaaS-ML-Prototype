@@ -11,7 +11,7 @@ git pull
 }
 
 
-./partial_start.sh
+source ./partial_start.sh
 
 
 ITERATIONS=`cat .iterations`

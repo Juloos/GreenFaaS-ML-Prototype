@@ -98,4 +98,3 @@ while [ -n "$TMP_OW_HOSTS" ]; do
   done
   sleep 1s
 done
-
