@@ -26,4 +26,5 @@ else
   NIGHT_OR_DAY="day"
 fi
 
+rm -f deploy_logs.stdout deploy_logs.stderr
 oarsub -t $NIGHT_OR_DAY -t destructive -t monitor=wattmetre_power_watt -t deploy -l {"core_count >= 12 AND memnode >= 32768 AND wattmeter=YES"}/cluster=1/host=$NB_OW+{"core_count >= 4 AND memnode >= 8192"}/host=$NB_SWIFT,walltime=$WT -O deploy_logs.stdout -E deploy_logs.stderr ./g5k_deploy/start.sh
