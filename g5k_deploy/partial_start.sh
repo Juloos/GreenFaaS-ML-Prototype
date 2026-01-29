@@ -60,6 +60,9 @@ for line in "${HOSTS[@]}"; do
   $skip || SWIFT_HOSTS+=("$host")
 done
 
+export OW_HOSTS
+export SWIFT_HOSTS
+
 
 ##############
 # Deployment #
