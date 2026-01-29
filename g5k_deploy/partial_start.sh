@@ -66,7 +66,7 @@ done
 ##############
 
 echo "Deploying Openwhisk on ${OW_HOSTS[@]}"
-IFS='\n' echo "${OW_HOSTS[*]}" | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml |& sed "s/^/  /"
+printf '%s\n' "${OW_HOSTS[@]}" | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml |& sed "s/^/  /"
 
 echo "Starting up Openwhisk..."
 for HOST in "${OW_HOSTS[@]}"; do
@@ -76,7 +76,7 @@ done
 
 
 echo "Deploying Swift on ${SWIFT_HOSTS[@]}"
-IFS='\n' echo "${SWIFT_HOSTS[*]}" | kadeploy3 -f - -a ~/public/swift_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml |& sed "s/^/  /"
+printf '%s\n' "${SWIFT_HOSTS[@]}" | kadeploy3 -f - -a ~/public/swift_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml |& sed "s/^/  /"
 
 echo "Starting up Swift..."
 for HOST in "${SWIFT_HOSTS[@]}"; do
