@@ -11,7 +11,7 @@ git pull
 }
 
 
-source ./partial_start.sh
+source ./g5k_deploy/partial_start.sh
 
 
 ITERATIONS=`cat .iterations`
