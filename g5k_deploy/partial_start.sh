@@ -51,7 +51,7 @@ done
 # Put everything else as Swift hosts
 SWIFT_HOSTS=()
 for line in "${HOSTS[@]}"; do
-  read -r host cluster _ <<< "$line"
+  read -r host _ <<< "$line"
   # Skip OW hosts
   skip=false
   for ow in "${OW_HOSTS[@]}"; do
@@ -66,7 +66,7 @@ done
 ##############
 
 echo "Deploying Openwhisk on $OW_HOSTS"
-echo $OW_HOSTS | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml |& sed "s/^/  /"
+echo ${OW_HOSTS[@]} | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml |& sed "s/^/  /"
 
 echo "Starting up Openwhisk..."
 for HOST in $OW_HOSTS; do
@@ -76,7 +76,7 @@ done
 
 
 echo "Deploying Swift on $SWIFT_HOSTS"
-echo $SWIFT_HOSTS | kadeploy3 -f - -a ~/public/swift_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml |& sed "s/^/  /"
+echo ${SWIFT_HOSTS[@]} | kadeploy3 -f - -a ~/public/swift_env.yml -p SYSTEM --custom-steps ~/public/partitioning.yml |& sed "s/^/  /"
 
 echo "Starting up Swift..."
 for HOST in $SWIFT_HOSTS; do
@@ -87,7 +87,7 @@ done
 
 echo "Waiting for Openwhisk to be up and running..."
 sleep 5m
-TMP_OW_HOSTS=$OW_HOSTS
+TMP_OW_HOSTS=("${OW_HOSTS[@]}")
 while [ -n "$TMP_OW_HOSTS" ]; do
   for HOST in $TMP_OW_HOSTS; do
     ./bin/wsk -i --apihost "$HOST:31001" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP" list >/dev/null 2>&1
