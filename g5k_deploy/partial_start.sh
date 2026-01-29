@@ -91,7 +91,7 @@ done
 echo "Waiting for Openwhisk to be up and running..."
 sleep 5m
 TMP_OW_HOSTS=("${OW_HOSTS[@]}")
-while [ ${#TMP_OW_HOSTS[@]} -gt 0 ]; do
+while [ -n "$(${#TMP_OW_HOSTS[@]} | tr -d ' ')" ]; do
   for HOST in "${TMP_OW_HOSTS[@]}"; do
     ./bin/wsk -i --apihost "$HOST:31001" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP" list >/dev/null 2>&1
     if [ $? -eq 0 ]; then

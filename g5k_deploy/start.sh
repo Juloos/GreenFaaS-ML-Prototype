@@ -27,7 +27,7 @@ for HOST in "${OW_HOSTS[@]}"; do
 done
 
 echo "Waiting for tasks to finish..."
-while [ ${#OW_HOSTS[@]} -gt 0 ]; do
+while [ -n "$(${#OW_HOSTS[@]} | tr -d ' ')" ]; do
   for HOST in "${OW_HOSTS[@]}"; do
     if [ -f "logs/$HOST.log" ]; then
       echo "  on $HOST: done"
