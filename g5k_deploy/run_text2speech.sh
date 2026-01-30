@@ -37,7 +37,7 @@ wskdeploy -m text2speech/manifest.yml ||
 SCHEMAS="S1 S3 S4 S5"
 TEXTS=$(ls swift_files | grep -E "^.*\.txt$" | tr -s '\n' ' ')
 MIN_TEXT=$(echo "${TEXTS[@]}" | sed "s/ /\n/g" | sort -g | head -n 1)
-echo "Using \"text\" from : $TEXTS"
+echo "Using \"text\" from : ${TEXTS[@]}"
 
 HOSTNAME=$(hostname)
 mkdir -p "energy_results/$HOSTNAME/"
@@ -105,3 +105,12 @@ for IPV4 in ${IPV4LIST[@]}; do
   echo "  for ipv4 $IPV4"
   swift delete "whiskcontainer" --prefix "$HOSTNAME" -A "http://$IPV4:8080/auth/v1.0" -U "test:tester" -K "testing" |& sed "s/^/    /"
 done
+
+echo "Creating manifest..."
+tee "energy_results/$HOSTNAME/manifest.txt" <<-EOF |& sed "s/^/  /"
+  HOSTNAME=$HOSTNAME
+  IPV4LIST=(${IPV4LIST[@]})
+  TEXTS=(${TEXTS[@]})
+  ITERATIONS=$ITERATIONS
+  RUNS=$RUNS
+EOF
