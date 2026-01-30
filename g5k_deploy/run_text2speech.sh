@@ -86,12 +86,12 @@ for SCHEMA in $SCHEMAS; do
         IPV4I=$(( (IPV4I + 1) % ${#IPV4LIST[@]} ))
       done
     done
-    echo "  (run $run) waiting for activations to complete..."
+    echo "    waiting for activations to complete..."
     for ACTIVATION in $(cat activations); do
       while ( wsk -i activation get "$ACTIVATION" >/dev/null 2>&1 ; test $? -ne 0 ); do
         sleep 1s
       done
-      echo "    got $ACTIVATION"
+      echo "      got $ACTIVATION"
     done
   done
   end=$(date +%FT%T)
@@ -103,5 +103,5 @@ done
 echo "Cleaning up swift files from host's container..."
 for IPV4 in ${IPV4LIST[@]}; do
   echo "  for ipv4 $IPV4"
-  swift delete "whiskcontainer" --prefix "$HOSTNAME" -A "http://$IPV4:8080/auth/v1.0" -U "test:tester" -K "testing"
+  swift delete "whiskcontainer" --prefix "$HOSTNAME" -A "http://$IPV4:8080/auth/v1.0" -U "test:tester" -K "testing" |& sed "s/^/    /"
 done
