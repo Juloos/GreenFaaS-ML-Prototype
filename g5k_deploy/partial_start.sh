@@ -11,7 +11,11 @@ git pull
 }
 
 
-NB_OW=`cat .openwhisk_instances`
+if [ -z "$1" ]; then
+  NB_OW=`cat .openwhisk_instances`
+else
+  NB_OW=$1
+fi
 
 
 ######################

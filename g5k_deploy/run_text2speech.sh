@@ -40,6 +40,7 @@ MIN_TEXT=$(echo "${TEXTS[@]}" | sed "s/ /\n/g" | sort -g | head -n 1)
 echo "Using \"text\" from : ${TEXTS[@]}"
 
 HOSTNAME=$(hostname)
+SITE=$(cut -d '.' -f 2 <<<"${IPV4LIST[0]}")
 mkdir -p "energy_results/$HOSTNAME/"
 
 echo "Uploading swift files to host's container..." # Redundant but just in case, also there should be only few hosts running this script
@@ -52,8 +53,8 @@ echo Waiting 1m...
 start=$(date +%FT%T)
 sleep 1m
 end=$(date +%FT%T)
-echo "Pulling from https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
-curl -sk "https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
+echo "Pulling from https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
+curl -sk "https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
   >"energy_results/$HOSTNAME/idle.json" 2>/dev/null
 
 IPV4I=0
@@ -95,8 +96,8 @@ for SCHEMA in $SCHEMAS; do
     done
   done
   end=$(date +%FT%T)
-  echo "Pulling from https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
-  curl -sk "https://api.grid5000.fr/stable/sites/lyon/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
+  echo "Pulling from https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
+  curl -sk "https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
     >"energy_results/$HOSTNAME/$SCHEMA.json" 2>/dev/null
 done
 
