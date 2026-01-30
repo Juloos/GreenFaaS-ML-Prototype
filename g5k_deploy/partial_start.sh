@@ -98,7 +98,7 @@ TMP_OW_HOSTS=("${OW_HOSTS[@]}")
 while [ -n "$(tr -d ' ' <<<"${TMP_OW_HOSTS[@]}")" ]; do
   for HOST in "${TMP_OW_HOSTS[@]}"; do
     # ./bin/wsk -i --apihost "$HOST:31001" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP" list >/dev/null 2>&1
-    [ -n "$(ssh root@$HOST 'cat openwhisk.log | grep "owdev-install-packages-.*Completed"' 2>/dev/null)" ]
+    [ -n "$(ssh root@$HOST 'kubectl get pods -n openwhisk | grep "owdev-install-packages-.*Completed"' 2>/dev/null)" ]
     if [ $? -eq 0 ]; then
       echo "  on $HOST: up"
       TMP_OW_HOSTS=("${TMP_OW_HOSTS[@]/$HOST}")
