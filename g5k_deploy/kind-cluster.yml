@@ -5,6 +5,11 @@
 
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
+containerdConfigPatches:
+  - |
+    [plugins."io.containerd.grpc.v1.cri".registry.mirrors]
+      [plugins."io.containerd.grpc.v1.cri".registry.mirrors."docker.io"]
+        endpoint = ["http://docker-cache.grid5000.fr"]
 nodes:
 - role: control-plane
 - role: worker

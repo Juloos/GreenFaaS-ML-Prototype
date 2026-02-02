@@ -46,6 +46,8 @@ EOF2
   echo -e "\nInstalling Docker Engine"
   apt update -y |& sed "s/^/  /"
   apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin |& sed "s/^/  /"
+  tee /etc/docker/daemon.json <<<'{"registry-mirrors":["http://docker-cache.grid5000.fr"]}' |& sed "s/^/  /"
+  systemctl restart docker |& sed "s/^/  /"
   apt autoremove -y |& sed "s/^/  /"
   apt clean |& sed "s/^/  /"
 
