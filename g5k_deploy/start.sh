@@ -21,11 +21,22 @@ shift_left() {
 }
 
 
-source ./g5k_deploy/partial_start.sh
+# $1 is NB_OW
+source ./g5k_deploy/partial_start.sh "$1"
 
 
-ITERATIONS=`cat .iterations`
-RUNS=`cat .runs`
+if [ -z "$2" ]; then
+  ITERATIONS=`cat .iterations`
+else
+  ITERATIONS=$2
+fi
+
+if [ -z "$3" ]; then
+  RUNS=`cat .runs`
+else
+  RUNS=$3
+fi
+
 
 echo "Deploying the demo..."
 for HOST in "${OW_HOSTS[@]}"; do
