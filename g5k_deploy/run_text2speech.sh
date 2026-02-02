@@ -108,10 +108,10 @@ for IPV4 in ${IPV4LIST[@]}; do
 done
 
 echo "Creating manifest..."
-tee "energy_results/$HOSTNAME/manifest.txt" <<-EOF |& sed "s/^/  /"
-  HOSTNAME=$HOSTNAME
-  IPV4LIST=(${IPV4LIST[@]})
-  TEXTS=(${TEXTS[@]})
-  ITERATIONS=$ITERATIONS
-  RUNS=$RUNS
+tee "energy_results/$HOSTNAME/manifest.txt" <<EOF |& sed "s/^/  /"
+HOSTNAME=$HOSTNAME
+IPV4LIST=(${IPV4LIST[@]})
+TEXTS=(${TEXTS[@]})
+ITERATIONS=$ITERATIONS
+RUNS=$RUNS
 EOF
