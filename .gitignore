@@ -1,5 +1,7 @@
 decision_tree/__pycache__/
 **/*.log
 energy_results/*.csv
+energy_results/*.png
+energy_results/*.svg
 energy_results/*/
 .vscode/

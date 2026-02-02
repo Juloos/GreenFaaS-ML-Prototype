@@ -27,7 +27,6 @@ source ./g5k_deploy/partial_start.sh
 ITERATIONS=`cat .iterations`
 RUNS=`cat .runs`
 
-mkdir -p logs
 echo "Deploying the demo..."
 for HOST in "${OW_HOSTS[@]}"; do
   echo "  on $HOST"
