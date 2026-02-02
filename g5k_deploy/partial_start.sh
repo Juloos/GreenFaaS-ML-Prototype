@@ -95,6 +95,7 @@ done
 echo "Waiting for Openwhisk to be up and running..."
 sleep 5m
 TMP_OW_HOSTS=("${OW_HOSTS[@]}")
+waiting_time=0
 while [ -n "$(tr -d ' ' <<<"${TMP_OW_HOSTS[@]}")" ]; do
   for HOST in "${TMP_OW_HOSTS[@]}"; do
     # ./bin/wsk -i --apihost "$HOST:31001" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP" list >/dev/null 2>&1
@@ -105,4 +106,9 @@ while [ -n "$(tr -d ' ' <<<"${TMP_OW_HOSTS[@]}")" ]; do
     fi
   done
   sleep 1s
+  waiting_time=$((waiting_time + 1))
+  if [ $waiting_time -ge 900 ]; then  # 15m + 5m should be largely enough
+    echo "  timed out"
+    exit 1
+  fi
 done
