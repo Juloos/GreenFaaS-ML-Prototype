@@ -44,7 +44,7 @@ for HOST in "${OW_HOSTS[@]}"; do
   mkdir -p ./energy_results/$OAR_JOB_ID
   HHOSTNAME="$(cut -d '.' -f 1 <<<"$HOST")"
   ssh root@$HOST "./greenfaas/g5k_deploy/run_text2speech.sh '$(IFS=','; echo "${SWIFT_HOSTS[*]}")' '$ITERATIONS' '$RUNS' >tts.log 2>&1" >/dev/null 2>&1 &&
-    scp -r root@$HOST:/root/greenfaas/energy_results/$HHOSTNAME ./energy_results/$OAR_JOB_ID &&
+    scp -r root@$HOST:/root/greenfaas/energy_results/$HHOSTNAME ./energy_results/${OAR_JOB_ID}_${ITERATIONS}i-${RUNS}r-${1}ow &&
     scp root@$HOST:/root/tts.log logs/$HHOSTNAME.$OAR_JOB_ID.log &
   shift_left SWIFT_HOSTS
 done
