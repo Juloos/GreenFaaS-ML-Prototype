@@ -78,7 +78,7 @@ printf '%s\n' "${OW_HOSTS[@]}" | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p
 echo "Starting up Openwhisk..."
 for HOST in "${OW_HOSTS[@]}"; do
   echo "  on $HOST"
-  ssh root@$HOST "./greenfaas/g5k_deploy/run_openwhisk.sh >openwhisk.log 2>&1" >/dev/null 2>&1 &
+  ssh root@$HOST "./greenfaas/g5k_deploy/run_openwhisk.sh >openwhisk.log 2>&1 &" |& sed "s/^/    /"
 done
 
 
@@ -88,9 +88,27 @@ printf '%s\n' "${SWIFT_HOSTS[@]}" | kadeploy3 -f - -a ~/public/swift_env.yml -p 
 echo "Starting up Swift..."
 for HOST in "${SWIFT_HOSTS[@]}"; do
   echo "  on $HOST"
-  ssh root@$HOST "./greenfaas/g5k_deploy/run_swift.sh >swift.log 2>&1" >/dev/null 2>&1 &
+  ssh root@$HOST "./greenfaas/g5k_deploy/run_swift.sh >swift.log 2>&1 &" |& sed "s/^/    /"
 done
 
+echo "Waiting for Swift to be up and running..."
+TMP_SWIFT_HOSTS=("${SWIFT_HOSTS[@]}")
+waiting_time=0
+while [ -n "$(tr -d ' ' <<<"${TMP_SWIFT_HOSTS[@]}")" ]; do
+  for HOST in "${TMP_SWIFT_HOSTS[@]}"; do
+    curl -I -u "test\:tester:testing" "http://$HOST:8080/auth/v1.0" >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+      echo "  on $HOST: up"
+      TMP_SWIFT_HOSTS=("${TMP_SWIFT_HOSTS[@]/$HOST}")
+    fi
+  done
+  sleep 1s
+  waiting_time=$((waiting_time + 1))
+  if [ $waiting_time -ge 300 ]; then  # 5m should be largely enough
+    echo "  timed out"
+    exit 1
+  fi
+done
 
 echo "Waiting for Openwhisk to be up and running..."
 sleep 5m
