@@ -17,6 +17,8 @@ else
   NB_OW=$1
 fi
 
+SSHFLAGS="-o StrictHostKeyChecking=no"
+
 
 ######################
 # Resource selection #
@@ -78,7 +80,7 @@ printf '%s\n' "${OW_HOSTS[@]}" | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p
 echo "Starting up Openwhisk..."
 for HOST in "${OW_HOSTS[@]}"; do
   echo "  on $HOST"
-  ssh root@$HOST "./greenfaas/g5k_deploy/run_openwhisk.sh >openwhisk.log 2>&1 &" |& sed "s/^/    /"
+  ssh $SSHFLAGS root@$HOST "./greenfaas/g5k_deploy/run_openwhisk.sh >openwhisk.log 2>&1 &" |& sed "s/^/    /"
 done
 
 
@@ -88,7 +90,7 @@ printf '%s\n' "${SWIFT_HOSTS[@]}" | kadeploy3 -f - -a ~/public/swift_env.yml -p 
 echo "Starting up Swift..."
 for HOST in "${SWIFT_HOSTS[@]}"; do
   echo "  on $HOST"
-  ssh root@$HOST "./greenfaas/g5k_deploy/run_swift.sh >swift.log 2>&1 &" |& sed "s/^/    /"
+  ssh $SSHFLAGS root@$HOST "./greenfaas/g5k_deploy/run_swift.sh >swift.log 2>&1 &" |& sed "s/^/    /"
 done
 
 echo "Waiting for Swift to be up and running..."
@@ -117,7 +119,7 @@ waiting_time=0
 while [ -n "$(tr -d ' ' <<<"${TMP_OW_HOSTS[@]}")" ]; do
   for HOST in "${TMP_OW_HOSTS[@]}"; do
     # ./bin/wsk -i --apihost "$HOST:31001" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP" list >/dev/null 2>&1
-    [ -n "$(ssh root@$HOST 'kubectl get pods -n openwhisk | grep "owdev-install-packages-.*Completed"' 2>/dev/null)" ]
+    [ -n "$(ssh $SSHFLAGS root@$HOST 'kubectl get pods -n openwhisk | grep "owdev-install-packages-.*Completed"' 2>/dev/null)" ]
     if [ $? -eq 0 ]; then
       echo "  on $HOST: up"
       TMP_OW_HOSTS=("${TMP_OW_HOSTS[@]/$HOST}")

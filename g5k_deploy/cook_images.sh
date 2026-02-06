@@ -17,13 +17,15 @@ git pull
 
 HOST=`oarprint host | cut -d '.' -f 1 | head -n 1`
 
+SSHFLAGS="-o StrictHostKeyChecking=no"
+
 
 echo -e "\nDeploying on $HOST"
 kadeploy3 -m $HOST ubuntu2004-min |& sed "s/^/  /"
 
 
 echo -e "\nInstalling Docker"
-ssh root@$HOST <<-"EOF" |& sed "s/^/  /"
+ssh $SSHFLAGS root@$HOST <<-"EOF" |& sed "s/^/  /"
   echo -e "\nUpdating system and installing dependencies"
   apt update -y |& sed "s/^/  /"
   apt upgrade -y |& sed "s/^/  /"
@@ -58,13 +60,13 @@ EOF
 
 
 echo -e "\nPreparing Swift environment"
-ssh root@$HOST "docker pull openstackswift/saio" |& sed "s/^/  /"
-tgz-g5k -m $HOST -f ~/public/docker_swift_$(ssh root@$HOST "uname -m").tar.zst |& sed "s/^/  /"
-ssh root@$HOST "docker system prune -af" |& sed "s/^/  /"
+ssh $SSHFLAGS root@$HOST "docker pull openstackswift/saio" |& sed "s/^/  /"
+tgz-g5k -m $HOST -f ~/public/docker_swift_$(ssh $SSHFLAGS root@$HOST "uname -m").tar.zst |& sed "s/^/  /"
+ssh $SSHFLAGS root@$HOST "docker system prune -af" |& sed "s/^/  /"
 
 
 echo -e "\nPreparing Openwhisk environment"
-ssh root@$HOST <<-EOF |& sed "s/^/  /"
+ssh $SSHFLAGS root@$HOST <<-EOF |& sed "s/^/  /"
   echo -e "\nInstalling dependencies"
   apt install -y apt-transport-https gnupg gpg git python3-swiftclient |& sed "s/^/  /"
   
@@ -95,6 +97,6 @@ ssh root@$HOST <<-EOF |& sed "s/^/  /"
   apt autoremove -y |& sed "s/^/  /"
   apt clean |& sed "s/^/  /"
 EOF
-tgz-g5k -m $HOST -f ~/public/openwhisk_kube_$(ssh root@$HOST "uname -m").tar.zst |& sed "s/^/  /"
+tgz-g5k -m $HOST -f ~/public/openwhisk_kube_$(ssh $SSHFLAGS root@$HOST "uname -m").tar.zst |& sed "s/^/  /"
 
 echo -e "\nDone."
