@@ -11,7 +11,7 @@ git pull
 }
 
 
-if [ $(grep "help" <<<"$*") ]; then
+if [[ $(grep "help" <<<"$*") ]]; then
   echo "Usage: $0 [<walltime>] [<nb_openwhisk_instances>] [<nb_swift_instances>] [<iterations>] [<runs>] [day|night]"
   echo "  <walltime>: walltime for the job in format HH[:MM[:SS]], default: 2 (for 2h)"
   echo "  <nb_openwhisk_instances>: number of Openwhisk instances to deploy, default: value from .openwhisk_instances"
