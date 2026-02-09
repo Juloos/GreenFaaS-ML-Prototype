@@ -67,6 +67,6 @@ else
 fi
 
 echo "Submitting job..."
-oarsub -t $NIGHT_OR_DAY -t destructive -t monitor=wattmetre_power_watt -t deploy -l {"core_count >= 12 AND memnode >= 32768 AND wattmeter=YES"}/cluster=1/host=$NB_OW+{"core_count >= 4 AND memnode >= 8192"}/host=$NB_SWIFT,walltime=$WT -O "logs/deploy_logs.%jobid%.stdout" -E "logs/deploy_logs.%jobid%.stderr" -n "WT=$WT NB_OW=$NB_OW NB_SWIFT=$NB_SWIFT ITERATIONS=$ITERATIONS RUNS=$RUNS NIGHT_OR_DAY=$NIGHT_OR_DAY" "./g5k_deploy/start.sh $NB_OW $ITERATIONS $RUNS"
+oarsub -t $NIGHT_OR_DAY -t destructive -t monitor=wattmetre_power_watt -t deploy -l {"core_count >= 12 AND memnode >= 32768 AND wattmeter=YES"}/cluster=1/host=$NB_OW+{"core_count >= 4 AND memnode >= 8192"}/host=$NB_SWIFT,walltime=$WT -O "logs/deploy_logs.%jobid%.stdout" -E "logs/deploy_logs.%jobid%.stderr" -n "$WT $NB_OW $NB_SWIFT $ITERATIONS $RUNS $NIGHT_OR_DAY" "./g5k_deploy/start.sh $NB_OW $ITERATIONS $RUNS"
 echo "  Done. Reproduce with: $0 $WT $NB_OW $NB_SWIFT $ITERATIONS $RUNS $NIGHT_OR_DAY"
 echo "$0 $WT $NB_OW $NB_SWIFT $ITERATIONS $RUNS $NIGHT_OR_DAY" >>~/.greenfaas_submit_history
