@@ -80,7 +80,7 @@ printf '%s\n' "${OW_HOSTS[@]}" | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p
 echo "Starting up Openwhisk..."
 for HOST in "${OW_HOSTS[@]}"; do
   echo "  on $HOST"
-  ssh $SSHFLAGS root@$HOST "./greenfaas/g5k_deploy/run_openwhisk.sh >openwhisk.log 2>&1 &" |& sed "s/^/    /"
+  ssh $SSHFLAGS root@$HOST "./greenfaas/g5k_deploy/run_openwhisk.sh | ts "[%F %T] " >openwhisk.log 2>&1 &" |& sed "s/^/    /"
 done
 
 
@@ -90,7 +90,7 @@ printf '%s\n' "${SWIFT_HOSTS[@]}" | kadeploy3 -f - -a ~/public/swift_env.yml -p 
 echo "Starting up Swift..."
 for HOST in "${SWIFT_HOSTS[@]}"; do
   echo "  on $HOST"
-  ssh $SSHFLAGS root@$HOST "./greenfaas/g5k_deploy/run_swift.sh >swift.log 2>&1 &" |& sed "s/^/    /"
+  ssh $SSHFLAGS root@$HOST "./greenfaas/g5k_deploy/run_swift.sh | ts "[%F %T] " >swift.log 2>&1 &" |& sed "s/^/    /"
 done
 
 echo "Waiting for Swift to be up and running..."
