@@ -11,4 +11,5 @@ git pull
 }
 
 
-docker run -d -p 8080:8080 openstackswift/saio
+did="$(docker run -d -p 8080:8080 openstackswift/saio)"
+docker exec "$did" watch -td "cat /var/log/swift/all.log" | awk '!seen[$0]++'
