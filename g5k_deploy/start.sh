@@ -42,7 +42,7 @@ echo "Deploying the demo..."
 for HOST in "${OW_HOSTS[@]}"; do
   echo "  on $HOST"
   mkdir -p ./energy_results/${ITERATIONS}i-${RUNS}r-${1}ow_${OAR_JOB_ID}
-  ssh -o StrictHostKeyChecking=no root@$HOST "screen -dmS tts ./greenfaas/g5k_deploy/run_text2speech.sh '$(IFS=','; echo "${SWIFT_HOSTS[*]}")' '$ITERATIONS' '$RUNS' \\\|\\\& ts '[%F %T] ' \\\>tts.log 2\\\>\\\&1 \\\&" |& sed "s/^/    /"
+  ssh -o StrictHostKeyChecking=no root@$HOST "screen -dmS tts ./greenfaas/g5k_deploy/run_text2speech.sh '$(IFS=','; echo "${SWIFT_HOSTS[*]}")' '$ITERATIONS' '$RUNS' \|\& ts '[%F %T] ' \>tts.log 2\>\&1 \&" |& sed "s/^/    /"
   shift_left SWIFT_HOSTS
 done
 
