@@ -31,7 +31,7 @@ ssh $SSHFLAGS root@$HOST <<-"EOF" |& sed "s/^/  /"
   apt upgrade -y |& sed "s/^/  /"
   apt remove -y $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc 2>/dev/null | cut -f1) |& sed "s/^/  /"
   apt update -y |& sed "s/^/  /"
-  apt install -y ca-certificates curl moreutils screen |& sed "s/^/  /"
+  apt install -y ca-certificates curl moreutils |& sed "s/^/  /"
 
   echo -e "\nSetting up Docker repository"
   install -m 0755 -d /etc/apt/keyrings |& sed "s/^/  /"
