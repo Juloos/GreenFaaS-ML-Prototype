@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #OAR -t deploy
-#OAR -l {core_count >= 4 AND memnode >= 8192}host=1,walltime=0:40:00
+#OAR -l {core_count >= 4 AND memnode >= 8192}host=1,walltime=1
 #OAR -p wattmeter=YES
 
 

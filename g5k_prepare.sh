@@ -11,8 +11,8 @@ git pull
 }
 
 
-rm ~/public/openwhisk_kube_*.tar.zst ~/public/docker_swift_*.tar.zst
-rm g5k_image_cooking*.log
+rm ~/public/openwhisk_kube_*.tar.zst ~/public/docker_swift_*.tar.zst >/dev/null 2>&1
+rm g5k_image_cooking*.log >/dev/null 2>&1
 
 cp -r ./g5k_deploy/public/* ~/public/
 for config_file in $(basename -a ./g5k_deploy/public/*.yml); do
