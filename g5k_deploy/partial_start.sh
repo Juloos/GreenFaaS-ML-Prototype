@@ -49,7 +49,7 @@ done
 for cluster in "${!CLUSTERS[@]}"; do
   hosts=(${CLUSTERS[$cluster]})
   if (( ${#hosts[@]} >= NB_OW )); then
-    OW_HOSTS=("${hosts[@]:0:NB_OW}")
+    OW_HOSTS=(${hosts[@]:0:NB_OW})
     break
   fi
 done
@@ -101,7 +101,7 @@ while [ -n "$(tr -d ' ' <<<"${TMP_SWIFT_HOSTS[@]}")" ]; do
     curl -I -u "test\:tester:testing" "http://$HOST:8080/auth/v1.0" >/dev/null 2>&1
     if [ $? -eq 0 ]; then
       echo "  on $HOST: up"
-      TMP_SWIFT_HOSTS=("${TMP_SWIFT_HOSTS[@]/$HOST}")
+      TMP_SWIFT_HOSTS=(${TMP_SWIFT_HOSTS[@]/$HOST})
     fi
   done
   sleep 1s
@@ -122,7 +122,7 @@ while [ -n "$(tr -d ' ' <<<"${TMP_OW_HOSTS[@]}")" ]; do
     [ -n "$(ssh $SSHFLAGS root@$HOST 'kubectl get pods -n openwhisk | grep "owdev-install-packages-.*Completed"' 2>/dev/null)" ]
     if [ $? -eq 0 ]; then
       echo "  on $HOST: up"
-      TMP_OW_HOSTS=("${TMP_OW_HOSTS[@]/$HOST}")
+      TMP_OW_HOSTS=(${TMP_OW_HOSTS[@]/$HOST})
     fi
   done
   sleep 1s

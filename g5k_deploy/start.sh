@@ -50,16 +50,18 @@ echo "Waiting for tasks to finish..."
 while [ -n "$(tr -d ' ' <<<"${OW_HOSTS[@]}")" ]; do
   for HOST in "${SWIFT_HOSTS[@]}"; do
     HHOSTNAME="$(cut -d '.' -f 1 <<<"$HOST")"
-    scp root@$HOST:/root/swift.log logs/$OAR_JOB_ID.$HHOSTNAME.swift.log |& sed "s/^/  $HHOSTNAME: /"
+    if [[ -z "$HHOSTNAME" ]] then continue; fi
+    scp root@$HOST:/root/swift.log logs/$OAR_JOB_ID.$HHOSTNAME.swift.log |& sed "s/^/  $HHOSTNAME.swift: /"
   done
   for HOST in "${OW_HOSTS[@]}"; do
     HHOSTNAME="$(cut -d '.' -f 1 <<<"$HOST")"
-    scp root@$HOST:/root/ow.log logs/$OAR_JOB_ID.$HHOSTNAME.ow.log |& sed "s/^/  $HHOSTNAME: /"
-    scp root@$HOST:/root/tts.log logs/$OAR_JOB_ID.$HHOSTNAME.tts.log |& sed "s/^/  $HHOSTNAME: /"
+    if [[ -z "$HHOSTNAME" ]] then continue; fi
+    scp root@$HOST:/root/ow.log logs/$OAR_JOB_ID.$HHOSTNAME.ow.log |& sed "s/^/  $HHOSTNAME.ow: /"
+    scp root@$HOST:/root/tts.log logs/$OAR_JOB_ID.$HHOSTNAME.tts.log |& sed "s/^/  $HHOSTNAME.tts: /"
     if [[ "$(grep "Done" logs/$OAR_JOB_ID.$HHOSTNAME.tts.log)" ]]; then
       scp -r root@$HOST:/root/greenfaas/energy_results/$HHOSTNAME ./energy_results/${ITERATIONS}i-${RUNS}r-${1}ow_${OAR_JOB_ID} |& sed "s/^/  $HHOSTNAME: /"
       echo "  on $HOST: done"
-      OW_HOSTS=("${OW_HOSTS[@]/$HOST}")
+      OW_HOSTS=(${OW_HOSTS[@]/$HOST})
     fi
   done
   sleep 10s
