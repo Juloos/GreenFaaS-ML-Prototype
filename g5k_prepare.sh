@@ -20,4 +20,3 @@ for config_file in $(basename -a ./g5k_deploy/public/*.yml); do
 done
 
 oarsub -S ./g5k_deploy/cook_images.sh -O g5k_image_cooking.log -E g5k_image_cooking.err.log >g5k_image_cooking.log
-view g5k_image_cooking.log
