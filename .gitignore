@@ -5,3 +5,4 @@ energy_results/*.png
 energy_results/*.svg
 energy_results/*/
 .vscode/
+g5k_deploy/public/g5k-postinstall-unipart/
