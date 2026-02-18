@@ -50,12 +50,12 @@ echo "Waiting for tasks to finish..."
 while [ -n "$(tr -d ' ' <<<"${OW_HOSTS[@]}")" ]; do
   for HOST in "${SWIFT_HOSTS[@]}"; do
     HHOSTNAME="$(cut -d '.' -f 1 <<<"$HOST")"
-    if [[ -z "$HHOSTNAME" ]] then continue; fi
+    if [[ -z "$HHOSTNAME" ]]; then continue; fi
     scp root@$HOST:/root/swift.log logs/$OAR_JOB_ID.$HHOSTNAME.swift.log |& sed "s/^/  $HHOSTNAME.swift: /"
   done
   for HOST in "${OW_HOSTS[@]}"; do
     HHOSTNAME="$(cut -d '.' -f 1 <<<"$HOST")"
-    if [[ -z "$HHOSTNAME" ]] then continue; fi
+    if [[ -z "$HHOSTNAME" ]]; then continue; fi
     scp root@$HOST:/root/ow.log logs/$OAR_JOB_ID.$HHOSTNAME.ow.log |& sed "s/^/  $HHOSTNAME.ow: /"
     scp root@$HOST:/root/tts.log logs/$OAR_JOB_ID.$HHOSTNAME.tts.log |& sed "s/^/  $HHOSTNAME.tts: /"
     if [[ "$(grep "Done" logs/$OAR_JOB_ID.$HHOSTNAME.tts.log)" ]]; then
