@@ -1,4 +1,4 @@
 mklabel gpt
-mkpart KDPL_SYSTEM_disk0 ext4 1MiB 100%
+mkpart KDPL_SYSTEM_disk0 ext4 1MiB 95%
 toggle 1 boot
 align-check optimal 1
