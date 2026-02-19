@@ -13,9 +13,9 @@ image:
   kind: tar
   compression: zstd
 postinstalls:
-- archive: http://public/~{{USER}}/g5k-postinstall-unipart.tgz
+- archive: server:///grid5000/postinstalls/g5k-postinstall.tgz
   compression: gzip
-  script: g5k-postinstall --net netplan --disk-aliases --fstab custom
+  script: g5k-postinstall --net netplan --disk-aliases
 boot:
   kernel: "/boot/vmlinuz"
   initrd: "/boot/initrd.img"
@@ -38,9 +38,9 @@ image:
   kind: tar
   compression: zstd
 postinstalls:
-- archive: http://public/~{{USER}}/g5k-postinstall-unipart.tgz
+- archive: server:///grid5000/postinstalls/g5k-postinstall.tgz
   compression: gzip
-  script: g5k-postinstall --net netplan --disk-aliases --fstab custom
+  script: g5k-postinstall --net netplan --disk-aliases
 boot:
   kernel: "/boot/vmlinuz"
   initrd: "/boot/initrd.img"
