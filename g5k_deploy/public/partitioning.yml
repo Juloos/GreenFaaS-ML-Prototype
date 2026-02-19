@@ -14,7 +14,7 @@ SetDeploymentMiniOS:
       - action: exec
         name: partitioning
         # The variable $KADEPLOY_TMP_DIR will be substituted by Kadeploy
-        command: parted -a optimal $(jq -r '.storage_devices[]|select(.id=="disk0")|.by_path' /tmp/grid5000-ref-api.json) --script $(cat $KADEPLOY_TMP_DIR/map.parted)
+        command: parted -a optimal $(jq -r '.storage_devices[]\|select(.id=="disk0")\|.by_path' /tmp/grid5000-ref-api.json) --script $(cat $KADEPLOY_TMP_DIR/map.parted)
 # Hack to disable useless steps
   format_tmp_part:
     substitute:
