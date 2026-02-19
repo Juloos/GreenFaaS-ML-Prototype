@@ -1,4 +1,6 @@
 mklabel gpt
-mkpart KDPL_DEPLOY_disk0 ext4 1MiB 100%
-toggle 1 boot
+mkpart KDPL_SYSTEM_disk0 ext4 1MiB 1GiB
+mkpart KDPL_DEPLOY_disk0 ext4 1GiB 100%
+toggle 2 boot
 align-check optimal 1
+align-check optimal 2
