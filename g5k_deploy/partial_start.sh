@@ -80,6 +80,7 @@ printf '%s\n' "${OW_HOSTS[@]}" | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p
 echo "Starting up Openwhisk..."
 for HOST in "${OW_HOSTS[@]}"; do
   echo "  on $HOST"
+  ssh-keygen -R $HOST |& sed "s/^/    /"
   ssh $SSHFLAGS root@$HOST "bash -c './greenfaas/g5k_deploy/run_openwhisk.sh |& ts \"[%F %T] \" >ow.log 2>&1 &'" |& sed "s/^/    /"
 done
 
@@ -90,6 +91,7 @@ printf '%s\n' "${SWIFT_HOSTS[@]}" | kadeploy3 -f - -a ~/public/swift_env.yml -p 
 echo "Starting up Swift..."
 for HOST in "${SWIFT_HOSTS[@]}"; do
   echo "  on $HOST"
+  ssh-keygen -R $HOST |& sed "s/^/    /"
   ssh $SSHFLAGS root@$HOST "bash -c './greenfaas/g5k_deploy/run_swift.sh |& ts \"[%F %T] \" >swift.log 2>&1 &'" |& sed "s/^/    /"
 done
 
