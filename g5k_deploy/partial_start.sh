@@ -75,7 +75,7 @@ export SWIFT_HOSTS
 ##############
 
 echo "Deploying Openwhisk on ${OW_HOSTS[@]}"
-printf '%s\n' "${OW_HOSTS[@]}" | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p TMP |& sed "s/^/  /"
+printf '%s\n' "${OW_HOSTS[@]}" | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p TMP --force-steps "SetDeploymentMiniOS|SetDeploymentMiniOSUntrusted:1:900&BroadcastEnv|BroadcastEnvKascade:1:1800&BootNewEnv|BootNewEnvClassical:1:900" |& sed "s/^/  /"
 
 echo "Starting up Openwhisk..."
 for HOST in "${OW_HOSTS[@]}"; do
