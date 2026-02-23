@@ -62,6 +62,9 @@ done
 cores_max=0
 for cluster in "${!CLUSTERS[@]}"; do
   hosts=(${CLUSTERS[$cluster]})
+  ######## Special cluster handling (blacklist)
+  if [[ "$cluster" == "parasilo" ]]; then continue; fi
+  ########
   if (( ${#hosts[@]} >= NB_OW && ${CORES["$cluster"]} > $cores_max )); then
     OW_HOSTS=(${hosts[@]:0:NB_OW})
     cores_max=${CORES["$cluster"]}
