@@ -42,6 +42,18 @@ mapfile -t OW_ELIGIBLE < <(
 declare -A CLUSTERS
 for line in "${OW_ELIGIBLE[@]}"; do
   read -r host cluster core_count _ <<< "$line"
+  ######## Special cluster handling (splitting)
+  if [[ "$cluster" == "paradoxe" ]]; then  # paradoxe-[1-32]
+    if [[ $(grep -o [0-9]* <<<"$cluster" | head -n 1) <= 32 ]]; then
+      CLUSTERS["good-paradoxe"]+="$host "
+      CORES["good-paradoxe"]=$core_count
+    else
+      CLUSTERS["bad-paradoxe"]+="$host "
+      CORES["bad-paradoxe"]=$core_count
+    fi
+    continue
+  fi
+  ########
   CLUSTERS["$cluster"]+="$host "
   CORES["$cluster"]=$core_count
 done

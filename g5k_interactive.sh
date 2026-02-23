@@ -11,4 +11,4 @@ git pull
 }
 
 
-oarsub -t monitor=wattmetre_power_watt -t deploy -l {"core_count >= 12 AND memnode >= 32768 AND wattmeter=YES"}/cluster=1/host=1+{"core_count >= 4 AND memnode >= 8192"}/host=1,walltime=1 -I
+oarsub -t monitor=wattmetre_power_watt -t deploy -l {"core_count >= 12 AND memnode >= 32768 AND wattmeter=YES AND NOT cluster IN ('parasilo')"}/cluster=1/host=1+{"core_count >= 4 AND memnode >= 8192"}/host=1,walltime=1 -I
