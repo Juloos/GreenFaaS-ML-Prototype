@@ -41,15 +41,18 @@ mapfile -t OW_ELIGIBLE < <(
 # Group OW eligible hosts by cluster
 declare -A CLUSTERS
 for line in "${OW_ELIGIBLE[@]}"; do
-  read -r host cluster _ <<< "$line"
+  read -r host cluster core_count _ <<< "$line"
   CLUSTERS["$cluster"]+="$host "
+  CORES["$cluster"]=$core_count
 done
 
-# Find a cluster with at least NB_OW eligible hosts
+# Find all clusters with at least NB_OW eligible hosts, then take the one with most cores
+cores_max=0
 for cluster in "${!CLUSTERS[@]}"; do
   hosts=(${CLUSTERS[$cluster]})
-  if (( ${#hosts[@]} >= NB_OW )); then
+  if (( ${#hosts[@]} >= NB_OW && ${CORES["$cluster"]} > $cores_max )); then
     OW_HOSTS=(${hosts[@]:0:NB_OW})
+    cores_max=${CORES["$cluster"]}
     break
   fi
 done
