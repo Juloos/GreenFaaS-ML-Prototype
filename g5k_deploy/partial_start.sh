@@ -44,7 +44,7 @@ for line in "${OW_ELIGIBLE[@]}"; do
   read -r host cluster core_count _ <<< "$line"
   ######## Special cluster handling (splitting)
   if [[ "$cluster" == "paradoxe" ]]; then  # paradoxe-[1-32]
-    if (( 1 <= $(grep -o [0-9]* <<<"$host" | head -n 1) <= 32 )); then
+    if (( $(grep -o [0-9]* <<<"$host" | head -n 1) <= 32 )); then
       CLUSTERS["good-paradoxe"]+="$host "
       CORES["good-paradoxe"]=$core_count
     else
@@ -61,11 +61,11 @@ done
 # Find all clusters with at least NB_OW eligible hosts, then take the one with most cores
 cores_max=0
 for cluster in "${!CLUSTERS[@]}"; do
-  hosts=(${CLUSTERS[$cluster]})
   ######## Special cluster handling (blacklist)
   if [[ "$cluster" == "parasilo" ]]; then continue; fi
   if [[ "$cluster" == "bad-paradoxe" ]]; then continue; fi
   ########
+  hosts=(${CLUSTERS[$cluster]})
   if (( ${#hosts[@]} >= NB_OW && ${CORES["$cluster"]} > $cores_max )); then
     OW_HOSTS=(${hosts[@]:0:NB_OW})
     cores_max=${CORES["$cluster"]}
