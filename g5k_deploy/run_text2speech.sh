@@ -6,7 +6,7 @@ SCRIPTPATH="$(realpath "$0")"
 cd "$(dirname "$0")/.."
 git pull
 [ "$MD5" == "$(md5sum "$SCRIPTPATH" | cut -d ' ' -f 1)" ] || {
-  bash "$SCRIPTPATH" $@
+  bash "$SCRIPTPATH" "$@"
   exit $?
 }
 
@@ -19,7 +19,7 @@ else
 fi
 
 if [ -z "$2" ]; then
-  ITERATIONS=20
+  ITERATIONS=12
 else
   ITERATIONS=$2
 fi
@@ -116,4 +116,4 @@ ITERATIONS=$ITERATIONS
 RUNS=$RUNS
 EOF
 
-echo Done
+echo "Done"

@@ -6,13 +6,13 @@ SCRIPTPATH="$(realpath "$0")"
 cd "$(dirname "$0")/.."
 git pull
 [ "$MD5" == "$(md5sum "$SCRIPTPATH" | cut -d ' ' -f 1)" ] || {
-  bash "$SCRIPTPATH" $@
+  bash "$SCRIPTPATH" "$@"
   exit $?
 }
 
 
 if [ -z "$1" ]; then
-  NB_OW=`cat .openwhisk_instances`
+  NB_OW=1
 else
   NB_OW=$1
 fi

@@ -10,7 +10,7 @@ SCRIPTPATH="$(realpath "$0")"
 cd "$(dirname "$0")"
 git pull
 [ "$MD5" == "$(md5sum "$SCRIPTPATH" | cut -d ' ' -f 1)" ] || {
-  bash "$SCRIPTPATH" $@
+  bash "$SCRIPTPATH" "$@"
   exit $?
 }
 

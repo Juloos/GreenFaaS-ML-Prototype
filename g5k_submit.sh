@@ -6,9 +6,10 @@ SCRIPTPATH="$(realpath "$0")"
 cd "$(dirname "$0")"
 git pull
 [ "$MD5" == "$(md5sum "$SCRIPTPATH" | cut -d ' ' -f 1)" ] || {
-  bash "$SCRIPTPATH" $@
+  bash "$SCRIPTPATH" "$@"
   exit $?
 }
+
 
 source .sql.sh
 
@@ -16,10 +17,10 @@ source .sql.sh
 if [[ $(grep "help" <<<"$*") ]]; then
   echo "Usage: $0 [<walltime>] [<nb_openwhisk_instances>] [<nb_swift_instances>] [<iterations>] [<runs>] [day|night]"
   echo "  <walltime>: walltime for the job in format HH[:MM[:SS]], default: 2 (for 2h)"
-  echo "  <nb_openwhisk_instances>: number of Openwhisk instances to deploy, default: value from .openwhisk_instances"
-  echo "  <nb_swift_instances>: number of Swift instances to deploy, default: value from .swift_instances"
-  echo "  <iterations>: number of iterations per run, default: value from .iterations"
-  echo "  <runs>: number of runs, default: value from .runs"
+  echo "  <nb_openwhisk_instances>: number of Openwhisk instances to deploy, default: 1"
+  echo "  <nb_swift_instances>: number of Swift instances to deploy, default: 3"
+  echo "  <iterations>: number of iterations per run, default: 12"
+  echo "  <runs>: number of runs, default: 10"
   echo "  [day|night]: whether to schedule the job during the day or night, default: auto"
   exit 0
 fi
@@ -31,25 +32,25 @@ else
 fi
 
 if [ -z "$2" ]; then
-  NB_OW=`cat .openwhisk_instances`
+  NB_OW=1
 else
   NB_OW=$2
 fi
 
 if [ -z "$3" ]; then
-  NB_SWIFT=`cat .swift_instances`
+  NB_SWIFT=3
 else
   NB_SWIFT=$3
 fi
 
 if [ -z "$4" ]; then
-  ITERATIONS=`cat .iterations`
+  ITERATIONS=12
 else
   ITERATIONS=$4
 fi
 
 if [ -z "$5" ]; then
-  RUNS=`cat .runs`
+  RUNS=10
 else
   RUNS=$5
 fi
