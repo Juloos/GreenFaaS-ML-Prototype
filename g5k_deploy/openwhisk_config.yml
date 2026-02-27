@@ -6,7 +6,7 @@ whisk:
     apiHostProto: "https"
     useInternally: false
   containerPool:
-    userMemory: "16g"
+    userMemory: "{{USER_MEM_GB}}g"
   loadbalancer:
     blackboxFraction: "100%"
   limits:
@@ -47,7 +47,7 @@ toleration:
 invoker:
   imageTag: "c5970a6"
   options: "-Dwhisk.kubernetes.user-pod-node-affinity.enabled=false"
-  jvmHeapMB: "2048"
+  jvmHeapMB: "{{INVOKER_MEM_MB}}"
   loglevel: "ERROR"
   # must use KCF as kind uses containerd as its container runtime
   containerFactory:
