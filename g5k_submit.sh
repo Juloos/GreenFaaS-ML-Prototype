@@ -69,12 +69,12 @@ else
   fi
 fi
 
-largs="{\"$SQL_OW\"}/cluster=1/host=$NB_OW"
+largs="{$SQL_OW}/cluster=1/host=$NB_OW"
 if (( $NB_SWIFT > 0 )); then
-  largs+="+{\"$SQL_SWIFT\"}/host=$NB_SWIFT"
+  largs+="+{$SQL_SWIFT}/host=$NB_SWIFT"
 fi
 
 echo "Submitting job..."
-oarsub -t $NIGHT_OR_DAY -t monitor=wattmetre_power_watt -t deploy -l $largs,walltime=$WT -O "logs/deploy_logs.%jobid%.stdout" -E "logs/deploy_logs.%jobid%.stderr" -n "$WT $NB_OW $NB_SWIFT $ITERATIONS $RUNS $NIGHT_OR_DAY" "./g5k_deploy/start.sh $NB_OW $ITERATIONS $RUNS"
+oarsub -t "$NIGHT_OR_DAY" -t monitor=wattmetre_power_watt -t deploy -l "$largs,walltime=$WT" -O "logs/deploy_logs.%jobid%.stdout" -E "logs/deploy_logs.%jobid%.stderr" -n "$WT $NB_OW $NB_SWIFT $ITERATIONS $RUNS $NIGHT_OR_DAY" "./g5k_deploy/start.sh $NB_OW $ITERATIONS $RUNS"
 echo "  Done. Reproduce with: $0 $WT $NB_OW $NB_SWIFT $ITERATIONS $RUNS $NIGHT_OR_DAY"
 echo "$0 $WT $NB_OW $NB_SWIFT $ITERATIONS $RUNS $NIGHT_OR_DAY" >>~/.greenfaas_submit_history
