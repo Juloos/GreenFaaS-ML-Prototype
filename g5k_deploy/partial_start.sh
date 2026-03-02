@@ -93,26 +93,29 @@ export SWIFT_HOSTS
 # Deployment #
 ##############
 
-echo "Deploying Openwhisk on ${OW_HOSTS[@]}"
-printf '%s\n' "${OW_HOSTS[@]}" | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p TMP --force-steps "SetDeploymentMiniOS|SetDeploymentMiniOSUntrusted:0:900&BroadcastEnv|BroadcastEnvKascade:0:1800&BootNewEnv|BootNewEnvClassical:0:900,BootNewEnvHardReboot:0:900" |& sed "s/^/  /"
+echo "Starting the deployment of Openwhisk on ${OW_HOSTS[@]}"
+printf '%s\n' "${OW_HOSTS[@]}" | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p TMP --force-steps "SetDeploymentMiniOS|SetDeploymentMiniOSUntrusted:0:900&BroadcastEnv|BroadcastEnvKascade:0:1800&BootNewEnv|BootNewEnvClassical:0:900,BootNewEnvHardReboot:0:900" |& sed "s/^/  ow: /" ; {
+  echo "ow: Starting up Openwhisk..."
+  for HOST in "${OW_HOSTS[@]}"; do
+    echo "ow:   on $HOST"
+    ssh-keygen -R $HOST |& sed "s/^/ow:     /"
+    ssh $SSHFLAGS root@$HOST "bash -c './greenfaas/g5k_deploy/run_openwhisk.sh |& ts \"[%F %T] \" >ow.log 2>&1 &'" |& sed "s/^/ow:     /"
+  done
+} &
 
-echo "Starting up Openwhisk..."
-for HOST in "${OW_HOSTS[@]}"; do
-  echo "  on $HOST"
-  ssh-keygen -R $HOST |& sed "s/^/    /"
-  ssh $SSHFLAGS root@$HOST "bash -c './greenfaas/g5k_deploy/run_openwhisk.sh |& ts \"[%F %T] \" >ow.log 2>&1 &'" |& sed "s/^/    /"
-done
 
+echo "Starting the deployment of Swift on ${SWIFT_HOSTS[@]}"
+printf '%s\n' "${SWIFT_HOSTS[@]}" | kadeploy3 -f - -a ~/public/swift_env.yml -p TMP |& sed "s/^/ow:   /" ; {
+  echo "swift: Starting up Swift..."
+  for HOST in "${SWIFT_HOSTS[@]}"; do
+    echo "swift:   on $HOST"
+    ssh-keygen -R $HOST |& sed "s/^/swift:     /"
+    ssh $SSHFLAGS root@$HOST "bash -c './greenfaas/g5k_deploy/run_swift.sh |& ts \"[%F %T] \" >swift.log 2>&1 &'" |& sed "s/^/swift:     /"
+  done
+} &
 
-echo "Deploying Swift on ${SWIFT_HOSTS[@]}"
-printf '%s\n' "${SWIFT_HOSTS[@]}" | kadeploy3 -f - -a ~/public/swift_env.yml -p TMP |& sed "s/^/  /"
+wait
 
-echo "Starting up Swift..."
-for HOST in "${SWIFT_HOSTS[@]}"; do
-  echo "  on $HOST"
-  ssh-keygen -R $HOST |& sed "s/^/    /"
-  ssh $SSHFLAGS root@$HOST "bash -c './greenfaas/g5k_deploy/run_swift.sh |& ts \"[%F %T] \" >swift.log 2>&1 &'" |& sed "s/^/    /"
-done
 
 echo "Waiting for Swift to be up and running..."
 TMP_SWIFT_HOSTS=("${SWIFT_HOSTS[@]}")
@@ -127,7 +130,7 @@ while [ -n "$(tr -d ' ' <<<"${TMP_SWIFT_HOSTS[@]}")" ]; do
   done
   sleep 1s
   waiting_time=$((waiting_time + 1))
-  if [ $waiting_time -ge 300 ]; then  # 5m should be largely enough
+  if [ $waiting_time -ge 600 ]; then  # 10m should be largely enough
     echo "  timed out"
     exit 1
   fi
@@ -148,7 +151,7 @@ while [ -n "$(tr -d ' ' <<<"${TMP_OW_HOSTS[@]}")" ]; do
   done
   sleep 1s
   waiting_time=$((waiting_time + 1))
-  if [ $waiting_time -ge 900 ]; then  # 15m + 5m should be largely enough
+  if [ $waiting_time -ge 900 ]; then  # 15m + 5m should be largely enough here also
     echo "  timed out"
     exit 1
   fi
