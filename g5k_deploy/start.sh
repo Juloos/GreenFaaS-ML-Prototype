@@ -26,13 +26,13 @@ source ./g5k_deploy/partial_start.sh "$1"
 
 
 if [ -z "$2" ]; then
-  ITERATIONS=`cat .iterations`
+  ITERATIONS=12
 else
   ITERATIONS=$2
 fi
 
 if [ -z "$3" ]; then
-  RUNS=`cat .runs`
+  RUNS=10
 else
   RUNS=$3
 fi
