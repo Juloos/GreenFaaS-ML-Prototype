@@ -69,9 +69,9 @@ else
   fi
 fi
 
-largs="{$SQL_OW}/cluster=1/host=$NB_OW"
+largs="{\"$SQL_OW\"}/cluster=1/host=$NB_OW"
 if (( $NB_SWIFT > 0 )); then
-  largs+="+{$SQL_SWIFT}/host=$NB_SWIFT"
+  largs+="+{\"$SQL_SWIFT\"}/host=$NB_SWIFT"
 fi
 
 echo "Submitting job..."
