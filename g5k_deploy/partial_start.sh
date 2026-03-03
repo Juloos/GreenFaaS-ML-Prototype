@@ -138,7 +138,7 @@ while [ -n "$(tr -d ' ' <<<"${TMP_SWIFT_HOSTS[@]}")" ]; do
 done
 
 echo "Waiting for Openwhisk to be up and running..."
-sleep 5m
+sleep 10m
 TMP_OW_HOSTS=("${OW_HOSTS[@]}")
 waiting_time=0
 while [ -n "$(tr -d ' ' <<<"${TMP_OW_HOSTS[@]}")" ]; do
@@ -152,7 +152,7 @@ while [ -n "$(tr -d ' ' <<<"${TMP_OW_HOSTS[@]}")" ]; do
   done
   sleep 1s
   waiting_time=$((waiting_time + 1))
-  if [ $waiting_time -ge 900 ]; then  # 15m + 5m should be largely enough here also
+  if [ $waiting_time -ge 1200 ]; then  # 20m + 10m should be largely enough here also
     echo "  timed out"
     exit 1
   fi
