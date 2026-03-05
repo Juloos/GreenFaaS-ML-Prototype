@@ -15,49 +15,47 @@ source .sql.sh
 
 
 if [[ $(grep "help" <<<"$*") ]]; then
-  echo "Usage: $0 [<walltime>] [<nb_openwhisk_instances>] [<nb_swift_instances>] [<iterations>] [<runs>] [day|night]"
+  echo "Usage: $0 [-w <walltime>] [-ow <nb_openwhisk_instances>] [-sw <nb_swift_instances>] [-i <iterations>] [-r <runs>] [--day|--night] <benchmark> <benchmark_args...>"
+  echo "  <benchmark>: name of the benchmark to deploy and run, e.g. text2speech"
+  echo "  <benchmark_args...>: arguments to pass to the benchmark script, e.g. for text2speech: <texts>"
   echo "  <walltime>: walltime for the job in format HH[:MM[:SS]], default: 2 (for 2h)"
   echo "  <nb_openwhisk_instances>: number of Openwhisk instances to deploy, default: 1"
   echo "  <nb_swift_instances>: number of Swift instances to deploy, default: 3"
   echo "  <iterations>: number of iterations per run, default: 12"
   echo "  <runs>: number of runs, default: 10"
-  echo "  [day|night]: whether to schedule the job during the day or night, default: auto"
+  echo "  [--day|--night]: whether to schedule the job during the day or night, default: auto"
   exit 0
 fi
 
-if [ -z "$1" ]; then
-  WT=2
-else
-  WT=$1
-fi
+BENCH=""
+BENCHARGS=()
+WT=2
+NB_OW=1
+NB_SWIFT=3
+ITERATIONS=12
+RUNS=10
+NIGHT_OR_DAY="auto"
+for (( i = 0 ; i < $# ; i++ )); do
+  let j=$i+1
+  case "${!i}" in
+    -w) WT="${!j}"; ((i++)) ;;
+    -ow) NB_OW="${!j}"; ((i++)) ;;
+    -sw) NB_SWIFT="${!j}"; ((i++)) ;;
+    -i) ITERATIONS="${!j}"; ((i++)) ;;
+    -r) RUNS="${!j}"; ((i++)) ;;
+    --day) NIGHT_OR_DAY="day" ;;
+    --night) NIGHT_OR_DAY="night" ;;
+    *)
+      if [[ -z "$BENCH" ]]; then
+        BENCH="${!i}"
+      else
+        BENCHARGS+=("${!i}")
+      fi ;;
+  esac
+done
+STRBENCHARGS=$(printf '"%s" ' "${BENCHARGS[@]}")
 
-if [ -z "$2" ]; then
-  NB_OW=1
-else
-  NB_OW=$2
-fi
-
-if [ -z "$3" ]; then
-  NB_SWIFT=3
-else
-  NB_SWIFT=$3
-fi
-
-if [ -z "$4" ]; then
-  ITERATIONS=12
-else
-  ITERATIONS=$4
-fi
-
-if [ -z "$5" ]; then
-  RUNS=10
-else
-  RUNS=$5
-fi
-
-if [[ "$6" == "day" || "$6" == "night" ]]; then
-  NIGHT_OR_DAY=$6
-else
+if [[ "$NIGHT_OR_DAY" == "auto" ]]; then
   h=$(cut -d ':' -f 1 <<<"$WT:0:0")
   m=$(cut -d ':' -f 2 <<<"$WT:0:0")
   s=$(cut -d ':' -f 3 <<<"$WT:0:0")
@@ -75,6 +73,6 @@ if (( $NB_SWIFT > 0 )); then
 fi
 
 echo "Submitting job..."
-oarsub -t "$NIGHT_OR_DAY" -t monitor=wattmetre_power_watt -t deploy -l "$largs,walltime=$WT" -O "logs/deploy_logs.%jobid%.stdout" -E "logs/deploy_logs.%jobid%.stderr" -n "$WT $NB_OW $NB_SWIFT $ITERATIONS $RUNS $NIGHT_OR_DAY" "./g5k_deploy/start.sh $NB_OW $ITERATIONS $RUNS"
-echo "  Done. Reproduce with: $0 $WT $NB_OW $NB_SWIFT $ITERATIONS $RUNS $NIGHT_OR_DAY"
-echo "$0 $WT $NB_OW $NB_SWIFT $ITERATIONS $RUNS $NIGHT_OR_DAY" >>~/.greenfaas_submit_history
+oarsub -t "$NIGHT_OR_DAY" -t monitor=wattmetre_power_watt -t deploy -l "$largs,walltime=$WT" -O "logs/deploy_logs.%jobid%.stdout" -E "logs/deploy_logs.%jobid%.stderr" -n "$0 -w $WT -ow $NB_OW -sw $NB_SWIFT -i $ITERATIONS -r $RUNS --$NIGHT_OR_DAY '$BENCH' $STRBENCHARGS" "./g5k_deploy/benchmarks/$BENCH.sh $NB_OW $NB_SWIFT $ITERATIONS $RUNS $STRBENCHARGS"
+echo "  Done. Reproduce with: $0 -w $WT -ow $NB_OW -sw $NB_SWIFT -i $ITERATIONS -r $RUNS --$NIGHT_OR_DAY '$BENCH' $STRBENCHARGS"
+echo "$0 -w $WT -ow $NB_OW -sw $NB_SWIFT -i $ITERATIONS -r $RUNS --$NIGHT_OR_DAY '$BENCH' $STRBENCHARGS" >>~/.greenfaas_submit_history

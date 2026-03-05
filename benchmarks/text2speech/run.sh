@@ -3,7 +3,7 @@
 
 MD5="$(md5sum "$0" | cut -d ' ' -f 1)"
 SCRIPTPATH="$(realpath "$0")"
-cd "$(dirname "$0")/.."
+cd "$(dirname "$0")/../.."
 git pull
 [ "$MD5" == "$(md5sum "$SCRIPTPATH" | cut -d ' ' -f 1)" ] || {
   bash "$SCRIPTPATH" "$@"
@@ -11,8 +11,10 @@ git pull
 }
 
 
+cd "$(dirname "$0")"
+
 if [ -z "$1" ]; then
-  echo "Usage: $0 <ipv4s> [<iterations>] [<runs>]"
+  echo "Usage: $0 <ipv4s> [<iterations>] [<runs>] [<texts>]"
   exit 1
 else
   IFS=',' read -ra IPV4LIST <<< "$1"
@@ -30,28 +32,27 @@ else
   RUNS=$3
 fi
 
-wsk -i property set --apihost "https://localhost:31001" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP"
-wskdeploy -m text2speech/manifest.yml ||
-  { echo "Failed to deploy, make sure Openwhisk is running."; exit 1; }
-
-SCHEMAS="S1 S3 S4 S5"
-TEXTS=$(ls swift_files | grep -E "^.*\.txt$" | tr -s '\n' ' ')
+if [ -z "$4" ]; then
+  TEXTS=$(ls storage_objects | grep -E "^.*\.txt$" | tr -s '\n' ' ')
+else
+  IFS=',' read -ra TEXTS <<< "$4"
+fi
 MIN_TEXT=$(echo "${TEXTS[@]}" | sed "s/ /\n/g" | sort -g | head -n 1)
 echo "Using \"text\" from : ${TEXTS[@]}"
 
+wsk -i property set --apihost "https://localhost:31001" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP"
+wskdeploy -m src/manifest.yml ||
+  { echo "Failed to deploy, make sure Openwhisk is running."; exit 1; }
+
+SCHEMAS="S1 S3 S4 S5"
+
 HOSTNAME=$(hostname)
-SITE=$(cut -d '.' -f 2 <<<"${IPV4LIST[0]}")
+SITE=$(cut -d '.' -f 2 <<<"${IPV4LIST[0]}")  # Assuming the job is not cross-site
 mkdir -p "energy_results/$HOSTNAME/"
 
-echo "Uploading swift files to host's container..." # Redundant but just in case, also there should be only few hosts running this script
-for IPV4 in ${IPV4LIST[@]}; do
-  echo "  for ipv4 $IPV4"
-  swift upload "whiskcontainer" swift_files --object-name "." --skip-identical -A "http://$IPV4:8080/auth/v1.0" -U "test:tester" -K "testing"
-done
-
-echo Waiting 1m...
+echo Waiting 5m...
 start=$(date +%FT%T)
-sleep 1m
+sleep 5m
 end=$(date +%FT%T)
 echo "Pulling from https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
 curl -sk "https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
@@ -70,12 +71,12 @@ for SCHEMA in $SCHEMAS; do
   while ( wsk -i activation get "$activation" >/dev/null 2>&1 ; test $? -ne 0 ); do
     sleep 1s
   done
-  start=$(date +%FT%T)
-  for (( run = 0 ; run < $RUNS ; run++ )); do
-    rm -f activations
-    echo "  run $run"
-    for TEXT in $TEXTS; do
-      echo "    for text $TEXT"
+  for TEXT in $TEXTS; do
+    echo "  for text $TEXT"
+    start=$(date +%FT%T)
+    for (( run = 0 ; run < $RUNS ; run++ )); do
+      rm -f activations
+      echo "    run $run"
       for (( i = 0 ; i < $ITERATIONS ; i++ )); do
         echo "      iteration $i (ipv4: ${IPV4LIST[IPV4I]})"
         wsk -i action invoke "demo/$SCHEMA" \
@@ -86,19 +87,23 @@ for SCHEMA in $SCHEMAS; do
         | cut -d ' ' -f 6 >>activations
         IPV4I=$(( (IPV4I + 1) % ${#IPV4LIST[@]} ))
       done
-    done
-    echo "    waiting for activations to complete..."
-    for ACTIVATION in $(cat activations); do
-      while ( wsk -i activation get "$ACTIVATION" >/dev/null 2>&1 ; test $? -ne 0 ); do
+      echo "    waiting for activations to complete..."
+      while [ -s activations ]; do
+        for ACTIVATION in $(cat activations); do
+          wsk -i activation get "$ACTIVATION" >/dev/null 2>&1
+          [[ test $? -e 0 ]] && {
+            sed -i "/$ACTIVATION/d" activations
+            echo "      got $ACTIVATION"
+          }
+        done
         sleep 1s
       done
-      echo "      got $ACTIVATION"
     done
+    end=$(date +%FT%T)
+    echo "Pulling from https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
+    curl -sk "https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
+      >"energy_results/$HOSTNAME/$TEXT/$SCHEMA.json" 2>/dev/null
   done
-  end=$(date +%FT%T)
-  echo "Pulling from https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
-  curl -sk "https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
-    >"energy_results/$HOSTNAME/$SCHEMA.json" 2>/dev/null
 done
 
 echo "Cleaning up swift files from host's container..."

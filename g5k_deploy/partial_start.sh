@@ -17,7 +17,7 @@ else
   NB_OW=$1
 fi
 
-SSHFLAGS="-o StrictHostKeyChecking=no"
+export SSHFLAGS="-o StrictHostKeyChecking=no"
 
 
 ######################
