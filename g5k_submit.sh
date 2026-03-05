@@ -73,6 +73,6 @@ if (( $NB_SWIFT > 0 )); then
 fi
 
 echo "Submitting job..."
-oarsub -t "$NIGHT_OR_DAY" -t monitor=wattmetre_power_watt -t deploy -l "$largs,walltime=$WT" -O "logs/deploy_logs.%jobid%.stdout" -E "logs/deploy_logs.%jobid%.stderr" -n "$0 -w $WT -ow $NB_OW -sw $NB_SWIFT -i $ITERATIONS -r $RUNS --$NIGHT_OR_DAY '$BENCH' $STRBENCHARGS" "./g5k_deploy/benchmarks/$BENCH.sh $NB_OW $NB_SWIFT $ITERATIONS $RUNS $STRBENCHARGS"
+oarsub -t "$NIGHT_OR_DAY" -t monitor=wattmetre_power_watt -t deploy -l "$largs,walltime=$WT" -O "logs/deploy_logs.%jobid%.stdout" -E "logs/deploy_logs.%jobid%.stderr" -n "-w $WT -ow $NB_OW -sw $NB_SWIFT -i $ITERATIONS -r $RUNS --$NIGHT_OR_DAY '$BENCH' $STRBENCHARGS" "./g5k_deploy/benchmarks/$BENCH.sh $NB_OW $NB_SWIFT $ITERATIONS $RUNS $STRBENCHARGS"
 echo "  Done. Reproduce with: $0 -w $WT -ow $NB_OW -sw $NB_SWIFT -i $ITERATIONS -r $RUNS --$NIGHT_OR_DAY '$BENCH' $STRBENCHARGS"
 echo "$0 -w $WT -ow $NB_OW -sw $NB_SWIFT -i $ITERATIONS -r $RUNS --$NIGHT_OR_DAY '$BENCH' $STRBENCHARGS" >>~/.greenfaas_submit_history
