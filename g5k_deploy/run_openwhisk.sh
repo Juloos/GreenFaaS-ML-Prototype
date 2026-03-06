@@ -21,6 +21,7 @@ sed "s/{{INVOKER_MEM_MB}}/$(( $totalKB * 10 / 100 / 1000 ))/g" -i ./openwhisk_co
 helm uninstall owdev -n openwhisk
 kind delete cluster --name kind
 
+swapoff -a
 ./greenfaas/g5k_deploy/start-kind.sh &&
   helm install owdev openwhisk/openwhisk -n openwhisk --create-namespace -f ./openwhisk_config.yml && {
     while true; do
