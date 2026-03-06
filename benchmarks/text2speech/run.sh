@@ -11,8 +11,6 @@ git pull
 }
 
 
-cd "$(dirname "$0")"
-
 if [ -z "$1" ]; then
   echo "Usage: $0 <ipv4s> [<iterations>] [<runs>] [<texts>]"
   exit 1
