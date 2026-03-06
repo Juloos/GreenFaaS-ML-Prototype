@@ -11,6 +11,9 @@ git pull
 }
 
 
+cd "$(dirname "$SCRIPTPATH")"
+
+
 if [ -z "$1" ]; then
   echo "Usage: $0 <ipv4s> [<iterations>] [<runs>] [<texts>]"
   exit 1
