@@ -15,8 +15,8 @@ cd ~
 
 totalKB=$(awk '/MemTotal:/{print $2}' /proc/meminfo)
 cp ./greenfaas/g5k_deploy/openwhisk_config.yml .
-sed "s/{{USER_MEM_GB}}/$(( $totalKB * 80 / 100 / 1000000 ))/g" -i ./openwhisk_config
-sed "s/{{INVOKER_MEM_MB}}/$(( $totalKB * 10 / 100 / 1000 ))/g" -i ./openwhisk_config
+sed "s/{{USER_MEM_GB}}/$(( $totalKB * 80 / 100 / 1000000 ))/g" -i ./openwhisk_config.yml
+sed "s/{{INVOKER_MEM_MB}}/$(( $totalKB * 10 / 100 / 1000 ))/g" -i ./openwhisk_config.yml
 
 helm uninstall owdev -n openwhisk
 kind delete cluster --name kind
