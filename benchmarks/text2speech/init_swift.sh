@@ -11,7 +11,7 @@ git pull
 }
 
 
-cd "$(dirname "$0")"
+cd "$(dirname "$SCRIPTPATH")"
 
 echo "Uploading benchmark files to container storage..."
 swift upload "whiskcontainer" storage_objects --object-name "." --skip-identical -A "http://localhost:8080/auth/v1.0" -U "test:tester" -K "testing" |& sed "s/^/  /"
