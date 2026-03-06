@@ -1,14 +1,16 @@
 #!/bin/bash
 
 
-MD5="$(md5sum "$0" | cut -d ' ' -f 1)"
-SCRIPTPATH="$(realpath "$0")"
-cd "$(dirname "$0")/.."
-git pull
-[ "$MD5" == "$(md5sum "$SCRIPTPATH" | cut -d ' ' -f 1)" ] || {
-  bash "$SCRIPTPATH" "$@"
-  exit $?
-}
+if [[ "$0" == "${BASH_SOURCE[0]}" ]]; then  # Not sourced
+  MD5="$(md5sum "$0" | cut -d ' ' -f 1)"
+  SCRIPTPATH="$(realpath "$0")"
+  cd "$(dirname "$0")/.."
+  git pull
+  [ "$MD5" == "$(md5sum "$SCRIPTPATH" | cut -d ' ' -f 1)" ] || {
+    bash "$SCRIPTPATH" "$@"
+    exit $?
+  }
+fi
 
 
 if [ -z "$1" ]; then

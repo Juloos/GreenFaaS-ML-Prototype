@@ -22,8 +22,8 @@ shift_left() {
 
 
 # $1 is NB_OW, $2 is NB_SWIFT
-pushd ./g5k_deploy
-source ./partial_start.sh "$1" "$2"
+pushd .
+source ./g5k_deploy/partial_start.sh "$1" "$2"
 popd
 
 ITERATIONS="$3"
