@@ -92,10 +92,10 @@ for SCHEMA in $SCHEMAS; do
       while [ -s activations ]; do
         for ACTIVATION in $(cat activations); do
           wsk -i activation get "$ACTIVATION" >/dev/null 2>&1
-          [[ test $? -e 0 ]] && {
+          if [ $? -eq 0 ]; then
             sed -i "/$ACTIVATION/d" activations
             echo "      got $ACTIVATION"
-          }
+          fi
         done
         sleep 1s
       done
