@@ -55,6 +55,7 @@ start=$(date +%FT%T)
 sleep 5m
 end=$(date +%FT%T)
 echo "Pulling from https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
+mkdir -p "energy_results/$HOSTNAME"
 curl -sk "https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
   >"energy_results/$HOSTNAME/idle.json" 2>/dev/null
 
