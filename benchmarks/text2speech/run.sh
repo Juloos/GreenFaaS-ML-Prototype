@@ -49,7 +49,6 @@ SCHEMAS="S1 S3 S4 S5"
 
 HOSTNAME=$(hostname)
 SITE=$(cut -d '.' -f 2 <<<"${IPV4LIST[0]}")  # Assuming the job is not cross-site
-mkdir -p "energy_results/$HOSTNAME/"
 
 echo Waiting 5m...
 start=$(date +%FT%T)
@@ -102,6 +101,7 @@ for SCHEMA in $SCHEMAS; do
     done
     end=$(date +%FT%T)
     echo "Pulling from https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
+    mkdir -p "energy_results/$HOSTNAME/$TEXT"
     curl -sk "https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
       >"energy_results/$HOSTNAME/$TEXT/$SCHEMA.json" 2>/dev/null
   done
