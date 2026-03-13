@@ -55,9 +55,9 @@ start=$(date +%FT%T)
 sleep 5m
 end=$(date +%FT%T)
 echo "Pulling from https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
-mkdir -p "energy_results/$HOSTNAME"
+mkdir -p "../energy_results/$HOSTNAME"
 curl -sk "https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
-  >"energy_results/$HOSTNAME/idle.json" 2>/dev/null
+  >"../energy_results/$HOSTNAME/idle.json" 2>/dev/null
 
 IPV4I=0
 for SCHEMA in $SCHEMAS; do
@@ -102,7 +102,7 @@ for SCHEMA in $SCHEMAS; do
     done
     end=$(date +%FT%T)
     echo "Pulling from https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
-    mkdir -p "energy_results/$HOSTNAME/$TEXT"
+    mkdir -p "../energy_results/$HOSTNAME/$TEXT"
     curl -sk "https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
       >"energy_results/$HOSTNAME/$TEXT/$SCHEMA.json" 2>/dev/null
   done
@@ -115,7 +115,7 @@ for IPV4 in ${IPV4LIST[@]}; do
 done
 
 echo "Creating manifest..."
-tee "energy_results/$HOSTNAME/manifest.txt" <<EOF |& sed "s/^/  /"
+tee "../energy_results/$HOSTNAME/manifest.txt" <<EOF |& sed "s/^/  /"
 HOSTNAME=$HOSTNAME
 IPV4LIST=(${IPV4LIST[@]})
 TEXTS=(${TEXTS[@]})
