@@ -11,9 +11,6 @@ git pull
 }
 
 
-cd "$(dirname "$SCRIPTPATH")"
-
-
 if [ -z "$1" ]; then
   echo "Usage: $0 <ipv4s> [<iterations>] [<runs>] [<texts>]"
   exit 1
@@ -34,7 +31,7 @@ else
 fi
 
 if [ -z "$4" ]; then
-  TEXTS=$(ls storage_objects | grep -E "^.*\.txt$" | tr -s '\n' ' ')
+  TEXTS=$(ls "$(dirname "$SCRIPTPATH")/storage_objects" | grep -E "^.*\.txt$" | tr -s '\n' ' ')
 else
   IFS=',' read -ra TEXTS <<< "$4"
 fi
@@ -42,7 +39,7 @@ MIN_TEXT=$(echo "${TEXTS[@]}" | sed "s/ /\n/g" | sort -g | head -n 1)
 echo "Using \"text\" from : ${TEXTS[@]}"
 
 wsk -i property set --apihost "https://localhost:31001" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP"
-wskdeploy -m src/manifest.yml ||
+wskdeploy -m "$(dirname "$SCRIPTPATH")/src/manifest.yml" ||
   { echo "Failed to deploy, make sure Openwhisk is running."; exit 1; }
 
 SCHEMAS="S1 S3 S4 S5"
@@ -55,9 +52,9 @@ start=$(date +%FT%T)
 sleep 5m
 end=$(date +%FT%T)
 echo "Pulling from https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
-mkdir -p "../energy_results/$HOSTNAME"
+mkdir -p "energy_results/$HOSTNAME"
 curl -sk "https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
-  >"../energy_results/$HOSTNAME/idle.json" 2>/dev/null
+  >"energy_results/$HOSTNAME/idle.json" 2>/dev/null
 
 IPV4I=0
 for SCHEMA in $SCHEMAS; do
@@ -102,7 +99,7 @@ for SCHEMA in $SCHEMAS; do
     done
     end=$(date +%FT%T)
     echo "Pulling from https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end"
-    mkdir -p "../energy_results/$HOSTNAME/$TEXT"
+    mkdir -p "energy_results/$HOSTNAME/$TEXT"
     curl -sk "https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&metrics=wattmetre_power_watt&start_time=$start&end_time=$end" \
       >"energy_results/$HOSTNAME/$TEXT/$SCHEMA.json" 2>/dev/null
   done
@@ -115,7 +112,7 @@ for IPV4 in ${IPV4LIST[@]}; do
 done
 
 echo "Creating manifest..."
-tee "../energy_results/$HOSTNAME/manifest.txt" <<EOF |& sed "s/^/  /"
+tee "energy_results/$HOSTNAME/manifest.txt" <<EOF |& sed "s/^/  /"
 HOSTNAME=$HOSTNAME
 IPV4LIST=(${IPV4LIST[@]})
 TEXTS=(${TEXTS[@]})
