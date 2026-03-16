@@ -69,7 +69,7 @@ for SCHEMA in $SCHEMAS; do
   while ( wsk -i activation get "$activation" >/dev/null 2>&1 ; test $? -ne 0 ); do
     sleep 1s
   done
-  for TEXT in $TEXTS; do
+  for TEXT in "${TEXTS[@]}"; do
     echo "  for text $TEXT"
     start=$(date +%FT%T)
     for (( run = 0 ; run < $RUNS ; run++ )); do
@@ -106,7 +106,7 @@ for SCHEMA in $SCHEMAS; do
 done
 
 echo "Cleaning up swift files from host's container..."
-for IPV4 in ${IPV4LIST[@]}; do
+for IPV4 in "${IPV4LIST[@]}"; do
   echo "  for ipv4 $IPV4"
   swift delete "whiskcontainer" --prefix "$HOSTNAME" -A "http://$IPV4:8080/auth/v1.0" -U "test:tester" -K "testing" |& sed "s/^/    /"
 done
