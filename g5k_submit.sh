@@ -60,7 +60,7 @@ if [[ "$NIGHT_OR_DAY" == "auto" ]]; then
   m=$(cut -d ':' -f 2 <<<"$WT:0:0")
   s=$(cut -d ':' -f 3 <<<"$WT:0:0")
   deadline=$(date -d "now + $h hours $m minutes $s seconds" +%H)
-  if [[ $h -ge 4 || $deadline -ge 19 ]]; then
+  if [[ $h -ge 6 || $deadline -ge 19 ]]; then
     NIGHT_OR_DAY="night"
   else
     NIGHT_OR_DAY="day"
