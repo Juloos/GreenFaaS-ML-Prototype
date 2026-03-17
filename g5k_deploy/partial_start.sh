@@ -97,7 +97,7 @@ export SWIFT_HOSTS
 
 {
   echo "Starting the deployment of Openwhisk on ${OW_HOSTS[@]}"
-  printf '%s\n' "${OW_HOSTS[@]}" | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p TMP --force-steps "SetDeploymentMiniOS|SetDeploymentMiniOSUntrusted:0:900&BroadcastEnv|BroadcastEnvKascade:0:1800&BootNewEnv|BootNewEnvClassical:0:900,BootNewEnvHardReboot:0:900" |& sed "s/^/     ow:   /"
+  printf '%s\n' "${OW_HOSTS[@]}" | kadeploy3 -f - -a ~/public/openwhisk_env.yml -p TMP --force-steps "SetDeploymentMiniOS|SetDeploymentMiniOSUntrusted:0:900&BroadcastEnv|BroadcastEnvKascade:0:1800&BootNewEnv|BootNewEnvClassical:0:1200,BootNewEnvHardReboot:0:1200" |& sed "s/^/     ow:   /"
   echo "     ow: Starting up Openwhisk..."
   for HOST in "${OW_HOSTS[@]}"; do
     echo "     ow:   on $HOST"
@@ -108,7 +108,7 @@ export SWIFT_HOSTS
 
 {
   echo "Starting the deployment of Swift on ${SWIFT_HOSTS[@]}"
-  printf '%s\n' "${SWIFT_HOSTS[@]}" | kadeploy3 -f - -a ~/public/swift_env.yml -p TMP --force-steps "SetDeploymentMiniOS|SetDeploymentMiniOSUntrusted:0:900&BroadcastEnv|BroadcastEnvKascade:0:1800&BootNewEnv|BootNewEnvClassical:0:900,BootNewEnvHardReboot:0:900" |& sed "s/^/  swift:   /"
+  printf '%s\n' "${SWIFT_HOSTS[@]}" | kadeploy3 -f - -a ~/public/swift_env.yml -p TMP --force-steps "SetDeploymentMiniOS|SetDeploymentMiniOSUntrusted:0:900&BroadcastEnv|BroadcastEnvKascade:0:1800&BootNewEnv|BootNewEnvClassical:0:1200,BootNewEnvHardReboot:0:1200" |& sed "s/^/  swift:   /"
   echo "  swift: Starting up Swift..."
   for HOST in "${SWIFT_HOSTS[@]}"; do
     echo "  swift:   on $HOST"
