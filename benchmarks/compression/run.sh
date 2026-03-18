@@ -58,11 +58,11 @@ curl -sk "https://api.grid5000.fr/stable/sites/$SITE/metrics?nodes=$HOSTNAME&met
 
 IPV4I=0
 for VARIANT in $VARIANTS; do
-  echo "schema $VARIANT"
+  echo "variant $VARIANT"
   echo "  warmup"
   activation=`wsk -i action invoke "compression/$VARIANT" \
       -p ipv4 "$IPV4" \
-      -p schema "$VARIANT" \
+      -p variant "$VARIANT" \
       -p file "$MIN_TEXT" \
       -p cid "$HOSTNAME-$VARIANT-warmup" \
     | cut -d ' ' -f 6`
@@ -79,7 +79,7 @@ for VARIANT in $VARIANTS; do
         echo "      iteration $i (ipv4: ${IPV4LIST[IPV4I]})"
         wsk -i action invoke "compression/$VARIANT" \
           -p ipv4 "${IPV4LIST[IPV4I]}" \
-          -p schema "$VARIANT" \
+          -p variant "$VARIANT" \
           -p file "$FILE" \
           -p cid "$HOSTNAME-$VARIANT-$FILE-$i" \
         | cut -d ' ' -f 6 >>activations
