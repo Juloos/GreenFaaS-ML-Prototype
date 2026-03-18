@@ -31,7 +31,7 @@ else
 fi
 
 if [ -z "$4" ]; then
-  FILES=$(ls -Q "$(dirname "$SCRIPTPATH")/storage_objects" | tr '"  "' '" "')
+  FILES=$(ls -Q "$(dirname "$SCRIPTPATH")/storage_objects" | sed 's/"  "/" "/g')
 else
   IFS=',' read -ra FILES <<< "$4"
 fi
