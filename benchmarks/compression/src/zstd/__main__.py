@@ -1,7 +1,8 @@
 import swiftclient
 import datetime
+import os
 import shutil
-import string
+import compression.zstd as zstd
 
 
 def pull(obj, ipv4):
@@ -10,7 +11,7 @@ def pull(obj, ipv4):
     auth_url = f'http://{ipv4}:8080/auth/v1.0'
     username = 'test:tester'
     password = 'testing'
-    out = obj 
+    out = obj
     # Connect to Swift
     conn = swiftclient.Connection(
     	authurl=auth_url,
@@ -46,41 +47,46 @@ def push(obj, ipv4):
     return ("Ok")
 
 
-def validate(file):
-    with open(file, "r") as f:
-        message = f.read()
-
-    words = message.translate(str.maketrans('', '', string.punctuation)).split()
-
-    prohibited_words = set(f"censored_word_{i}" for i in range(100))
-    for word in words:
-        if word.lower() in prohibited_words:
-            return "Invalid"  # will never happe in practice, its just for the computation time
-
-    return len(words)
-
-
 def main(args):
     
-    ipv4 = args.get("ipv4", "speech.ipv4.not.given")
-    text = args.get("text", "speech.text.not.given")
-    ttsid = args.get("ttsid", "speech.ttsid.not.given")
+    ipv4 = args.get("ipv4", "zstd.ipv4.not.given")
+    file = args.get("file", "zstd.file.not.given")
+    cid = args.get("cid", "zstd.cid.not.given")
+
+    maxLevel = zstd.CompressionParameter.compression_level.bounds()[1]
 
     pull_begin = datetime.datetime.now()
-    pull(text, ipv4)
+    pull(file, ipv4)
     pull_end = datetime.datetime.now()
     
     process_begin = datetime.datetime.now()
-    result = validate(text)
+    with open(file, 'rb') as f:
+        with zstd.open(cid, 'wb', level=maxLevel) as fz:
+            while True:
+                chunk = f.read(1024**2)
+                if not chunk:
+                    break
+                fz.write(chunk)
     process_end = datetime.datetime.now()
 
+    push_begin = datetime.datetime.now()
+    push(cid, ipv4)
+    push_end = datetime.datetime.now()
+
     response = {
-         "wordCount" : result,
-         "validation" : {
+         "fileSize" : os.path.getsize(file),
+         "archiveSize" : os.path.getsize(cid),
+         "variant" : "zstd",
+         "compression" : {
             "process" : (process_end - process_begin) / datetime.timedelta(seconds=1),
             "pull" : (pull_end - pull_begin) / datetime.timedelta(seconds=1),
-            "push" : 0
-         }
+            "push" : (push_end - push_begin) / datetime.timedelta(seconds=1)
+         },
+         "validation" : args.get("validation", {"process" : 0, "pull" : 0, "push" : 0}),
+         "ipv4" : ipv4,
+         "file" : file,
+         "cid" : cid
         }
 
-    return  {"body": response, "ipv4": ipv4, "text": text, "ttsid": ttsid}
+    return  {"body": response, "ipv4": ipv4, "file": file, "cid": cid}
+    

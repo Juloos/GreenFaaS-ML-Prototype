@@ -1,0 +1,23 @@
+packages:
+    compression:
+        actions:
+            zstd:
+                function: zstd/__main__.py
+                docker: python:3.14.3
+                web: true
+            # zlib:
+            #     function: zlib/__main__.py
+            #     docker: python:3.14.3
+            #     web: true
+            # lzma:
+            #     function: lzma/__main__.py
+            #     docker: python:3.14.3
+            #     web: true
+            # gzip:
+            #     function: gzip/__main__.py
+            #     docker: python:3.14.3
+            #     web: true
+            # bz2:
+            #     function: bz2/__main__.py
+            #     docker: python:3.14.3
+            #     web: true

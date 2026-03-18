@@ -20,7 +20,7 @@ def pull(obj, ipv4):
     	auth_version='1'
 	)
 
-    _, body = conn.get_object("whiskcontainer", obj, resp_chunk_size=65536)
+    _, body = conn.get_object("whiskcontainer", obj, resp_chunk_size=1024**2)
     with open(out, 'wb') as f:
         shutil.copyfileobj(body, f)
 
@@ -42,7 +42,7 @@ def push(obj, ipv4):
 	)
  
     with open(obj, 'rb') as f:
-        conn.put_object("whiskcontainer", obj, contents=f)
+        conn.put_object("whiskcontainer", obj, contents=f, chunk_size=1024**2)
  
     return ("Ok")
 
