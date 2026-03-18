@@ -11,4 +11,4 @@ git pull
 }
 
 
-source ../_common/init_swift.sh
+source benchmarks/_common/init_swift.sh
