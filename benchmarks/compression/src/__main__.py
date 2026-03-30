@@ -2,7 +2,6 @@ import swiftclient
 import datetime
 import os
 import shutil
-import compression.zstd as zstd
 
 
 def pull(obj, ipv4):
@@ -48,12 +47,25 @@ def push(obj, ipv4):
 
 
 def main(args):
+    import importlib
     
-    ipv4 = args.get("ipv4", "zstd.ipv4.not.given")
-    file = args.get("file", "zstd.file.not.given")
-    cid = args.get("cid", "zstd.cid.not.given")
+    ipv4 = args.get("ipv4", "zip.ipv4.not.given")
+    file = args.get("file", "zip.file.not.given")
+    cid = args.get("cid", "zip.cid.not.given")
+    algo = args.get("algo", "zip.algo.not.given")
 
-    maxLevel = zstd.CompressionParameter.compression_level.bounds()[1]
+    if algo in ("lz4", "brotli"):
+        zipper = importlib.import_module(algo)
+    else:
+        zipper = importlib.import_module(f"compression.{algo}")
+    maxLevel = {
+        "zstd": lambda: zipper.CompressionParameter.compression_level.bounds()[1],
+        "lzma": lambda: zipper.PRESET_EXTREME,
+        "gzip": lambda: 9,
+        "bz2": lambda: 9,
+        "lz4": lambda: zipper.COMPRESSIONLEVEL_MAX,
+        "brotli": lambda: zipper.MAX_QUALITY
+    }[algo]()
 
     pull_begin = datetime.datetime.now()
     pull(file, ipv4)
@@ -61,7 +73,7 @@ def main(args):
     
     process_begin = datetime.datetime.now()
     with open(file, 'rb') as f:
-        with zstd.open(cid, 'wb', level=maxLevel) as fz:
+        with zipper.open(cid, 'wb', level=maxLevel, preset=maxLevel, quality=maxLevel) as fz:
             while True:
                 chunk = f.read(1024**2)
                 if not chunk:
@@ -74,18 +86,17 @@ def main(args):
     push_end = datetime.datetime.now()
 
     response = {
-         "fileSize" : os.path.getsize(file),
-         "archiveSize" : os.path.getsize(cid),
-         "variant" : "zstd",
-         "compression" : {
+        "fileSize" : os.path.getsize(file),
+        "archiveSize" : os.path.getsize(cid),
+        "variant" : algo,
+        "compression" : {
             "process" : (process_end - process_begin) / datetime.timedelta(seconds=1),
             "pull" : (pull_end - pull_begin) / datetime.timedelta(seconds=1),
             "push" : (push_end - push_begin) / datetime.timedelta(seconds=1)
-         },
-         "ipv4" : ipv4,
-         "file" : file,
-         "cid" : cid
-        }
+        },
+        "ipv4" : ipv4,
+        "file" : file,
+        "cid" : cid
+    }
 
-    return  {"body": response, "ipv4": ipv4, "file": file, "cid": cid}
-    
+    return response

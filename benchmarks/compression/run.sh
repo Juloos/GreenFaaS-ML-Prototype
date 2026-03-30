@@ -42,7 +42,7 @@ wsk -i property set --apihost "https://localhost:31001" --auth "23bc46b1-71f6-4e
 wskdeploy -m "$(dirname "$SCRIPTPATH")/src/manifest.yml" ||
   { echo "Failed to deploy, make sure Openwhisk is running."; exit 1; }
 
-VARIANTS="zstd" # zlib lzma gzip bz2"
+VARIANTS="zstd" # lzma gzip bz2 lz4 brotli"
 
 HOSTNAME=$(hostname)
 SITE=$(cut -d '.' -f 2 <<<"${IPV4LIST[0]}")  # Assuming the job is not cross-site
@@ -62,7 +62,6 @@ for VARIANT in $VARIANTS; do
   echo "  warmup"
   activation=`wsk -i action invoke "compression/$VARIANT" \
       -p ipv4 "$IPV4" \
-      -p variant "$VARIANT" \
       -p file "$MIN_FILE" \
       -p cid "$HOSTNAME-$VARIANT-warmup" \
     | cut -d ' ' -f 6`
@@ -79,7 +78,6 @@ for VARIANT in $VARIANTS; do
         echo "      iteration $i (ipv4: ${IPV4LIST[IPV4I]})"
         wsk -i action invoke "compression/$VARIANT" \
           -p ipv4 "${IPV4LIST[IPV4I]}" \
-          -p variant "$VARIANT" \
           -p file "$FILE" \
           -p cid "$HOSTNAME-$VARIANT-$FILE-$i" \
         | cut -d ' ' -f 6 >>activations
