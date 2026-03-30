@@ -31,11 +31,11 @@ else
 fi
 
 if [ -z "$4" ]; then
-  FILES=$(ls "$(dirname "$SCRIPTPATH")/storage_objects" | tr -s '\n' ' ')
+  FILES=($(ls "$(dirname "$SCRIPTPATH")/storage_objects" | tr -s '\n' ' '))
 else
   IFS=',' read -ra FILES <<< "$4"
 fi
-MIN_TEXT=$(echo "${FILES[@]}" | sed "s/ /\n/g" | sort -g | head -n 1)
+MIN_FILE=$(ls -S "$(dirname "$SCRIPTPATH")/storage_objects" | tail -n 1)
 echo "Using \"file\" from : ${FILES[@]}"
 
 wsk -i property set --apihost "https://localhost:31001" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP"
@@ -63,7 +63,7 @@ for VARIANT in $VARIANTS; do
   activation=`wsk -i action invoke "compression/$VARIANT" \
       -p ipv4 "$IPV4" \
       -p variant "$VARIANT" \
-      -p file "$MIN_TEXT" \
+      -p file "$MIN_FILE" \
       -p cid "$HOSTNAME-$VARIANT-warmup" \
     | cut -d ' ' -f 6`
   while ( wsk -i activation get "$activation" >/dev/null 2>&1 ; test $? -ne 0 ); do

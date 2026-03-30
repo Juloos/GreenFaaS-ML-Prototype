@@ -31,11 +31,11 @@ else
 fi
 
 if [ -z "$4" ]; then
-  TEXTS=$(ls "$(dirname "$SCRIPTPATH")/storage_objects" | grep -E "^.*\.txt$" | tr -s '\n' ' ')
+  TEXTS=($(ls "$(dirname "$SCRIPTPATH")/storage_objects" | grep -E "^.*\.txt$" | tr -s '\n' ' '))
 else
   IFS=',' read -ra TEXTS <<< "$4"
 fi
-MIN_TEXT=$(echo "${TEXTS[@]}" | sed "s/ /\n/g" | sort -g | head -n 1)
+MIN_TEXT=$(ls -S "$(dirname "$SCRIPTPATH")/storage_objects" | tail -n 1)
 echo "Using \"text\" from : ${TEXTS[@]}"
 
 wsk -i property set --apihost "https://localhost:31001" --auth "23bc46b1-71f6-4ed5-8c54-816aa4f8c502:123zO3xZCLrMN6v2BKK1dXYFpXlPkccOFqm12CdAsMgRU4VrNZ9lyGVCGuMDGIwP"
