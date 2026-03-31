@@ -57,7 +57,7 @@ while [ -n "$(tr -d ' ' <<<"${OW_HOSTS[@]}")" ]; do
     scp root@$HOST:/root/ow.log logs/text2speech.$OAR_JOB_ID.$HHOSTNAME.ow.log |& sed "s/^/  $HHOSTNAME.ow: /"
     scp root@$HOST:/root/tts.log logs/text2speech.$OAR_JOB_ID.$HHOSTNAME.tts.log |& sed "s/^/  $HHOSTNAME.tts: /"
     if [[ "$(grep "Done" logs/text2speech.$OAR_JOB_ID.$HHOSTNAME.tts.log)" ]]; then
-      mkdir -p ./energy_results/${ITERATIONS}i-${RUNS}r-${1}ow_${OAR_JOB_ID}
+      mkdir -p ./energy_results/tts_${ITERATIONS}i-${RUNS}r-${1}ow_${OAR_JOB_ID}
       scp -r root@$HOST:/root/greenfaas/energy_results/$HHOSTNAME ./energy_results/tts_${ITERATIONS}i-${RUNS}r-${1}ow_${OAR_JOB_ID} |& sed "s/^/  $HHOSTNAME: /"
       echo "  on $HOST: done"
       OW_HOSTS=(${OW_HOSTS[@]/$HOST})
