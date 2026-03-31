@@ -42,7 +42,7 @@ wsk -i property set --apihost "https://localhost:31001" --auth "23bc46b1-71f6-4e
 wskdeploy -m "$(dirname "$SCRIPTPATH")/src/manifest.yml" ||
   { echo "Failed to deploy, make sure Openwhisk is running."; exit 1; }
 
-VARIANTS="zstd" # lzma gzip bz2 lz4 brotli"
+VARIANTS="zstd lzma gzip bz2 lz4 brotli"
 
 HOSTNAME=$(hostname)
 SITE=$(cut -d '.' -f 2 <<<"${IPV4LIST[0]}")  # Assuming the job is not cross-site
