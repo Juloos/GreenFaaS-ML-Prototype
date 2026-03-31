@@ -58,13 +58,13 @@ def main(args):
         zipper = importlib.import_module(algo)
     else:
         zipper = importlib.import_module(f"compression.{algo}")
-    maxLevel = {
-        "zstd": lambda: zipper.CompressionParameter.compression_level.bounds()[1],
-        "lzma": lambda: zipper.PRESET_EXTREME,
-        "gzip": lambda: 9,
-        "bz2": lambda: 9,
-        "lz4": lambda: zipper.COMPRESSIONLEVEL_MAX,
-        "brotli": lambda: zipper.MAX_QUALITY
+    maxLevelArg = {
+        "zstd": lambda: {"level": zipper.CompressionParameter.compression_level.bounds()[1]},
+        "lzma": lambda: {"preset": zipper.PRESET_EXTREME},
+        "gzip": lambda: {"compresslevel": 9},
+        "bz2": lambda: {"compresslevel": 9},
+        "lz4": lambda: {"compressionlevel": zipper.COMPRESSIONLEVEL_MAX},
+        "brotli": lambda: {"quality": zipper.MAX_QUALITY}
     }[algo]()
 
     pull_begin = datetime.datetime.now()
@@ -73,7 +73,7 @@ def main(args):
     
     process_begin = datetime.datetime.now()
     with open(file, 'rb') as f:
-        with zipper.open(cid, 'wb', level=maxLevel, preset=maxLevel, quality=maxLevel) as fz:
+        with zipper.open(cid, 'wb', **maxLevelArg) as fz:
             while True:
                 chunk = f.read(1024**2)
                 if not chunk:
