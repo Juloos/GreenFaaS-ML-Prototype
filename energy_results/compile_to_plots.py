@@ -2,10 +2,9 @@ import os
 import json
 import datetime
 import glob
-import matplotlib.pyplot as plt
-from matplotlib.widgets import CheckButtons, RadioButtons
 from itertools import product
-import numpy as np
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -64,126 +63,126 @@ for job in JOBS:
     
     def get_param_label(param_tuple):
         """Convert parameter tuple to readable label"""
-        if param_tuple == ("idle",):
-            return "idle"
         return " | ".join(str(p) for p in param_tuple)
     
-    def update_plot(selected_params):
-        """Update the bar plots based on selected parameters"""
-        for axis in axes:
-            axis.clear()
-        
-        # Collect data: variant -> host -> (watts, millis, joules)
+    # Collect data for all parameter combinations
+    all_variant_data = {}
+    for param in product(*params):
+        param_label = get_param_label(param)
         variant_data = {}
         unique_variants_ordered = []
         
         for host in hosts:
             # Always include idle for each host
-            variant = "idle"
-            if variant not in variant_data:
-                variant_data[variant] = {}
-                unique_variants_ordered.append(variant)
-            variant_data[variant][host] = (watts[host][variant], millis[host][variant], joules[host][variant])
+            if "idle" not in variant_data:
+                variant_data["idle"] = {}
+                unique_variants_ordered.append("idle")
+            variant_data["idle"][host] = (watts[host]["idle"], millis[host]["idle"], joules[host]["idle"])
             
-            # Include other variants
+            # Include benchmark variants for this parameter
             for var in variants:
                 if var == "idle":
                     continue
-                for param_combo in watts[host][var].keys():
-                    if param_combo in selected_params:
-                        if var not in variant_data:
-                            variant_data[var] = {}
-                            unique_variants_ordered.append(var)
-                        variant_data[var][host] = (watts[host][var][param_combo], millis[host][var][param_combo], joules[host][var][param_combo])
-                        break
+                if param in watts[host][var]:
+                    if var not in variant_data:
+                        variant_data[var] = {}
+                        unique_variants_ordered.append(var)
+                    variant_data[var][host] = (watts[host][var][param], millis[host][var][param], joules[host][var][param])
         
-        if not variant_data:
-            axes[1].text(0.5, 0.5, 'No data for selected parameters', 
-                         transform=axes[1].transAxes, ha='center', va='center')
-            fig.canvas.draw_idle()
-            return
+        if variant_data:
+            all_variant_data[param_label] = (variant_data, unique_variants_ordered)
+    
+    if not all_variant_data:
+        print(f"  No plots generated for job {job}")
+        os.chdir("..")
+        continue
+    
+    # Sort parameters by label for consistent ordering
+    param_labels = tuple(sorted(all_variant_data.keys()))
+    
+    # Get available hosts in order
+    available_hosts = []
+    for variant_data, _ in all_variant_data.values():
+        for host in hosts:
+            if any(host in variant_data[v] for v in variant_data):
+                if host not in available_hosts:
+                    available_hosts.append(host)
+    
+    # Define host colors
+    host_colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+    host_color_map = {host: host_colors[i % len(host_colors)] for i, host in enumerate(available_hosts)}
+    
+    # Create subplots
+    fig = make_subplots(
+        rows=3, cols=1,
+        subplot_titles=("Joules by Host", "Watts by Host", "Millis by Host"),
+        vertical_spacing=0.08
+    )
+    
+    # Metrics to plot
+    metrics = [
+        (2, "Joules"),
+        (0, "Watts"),
+        (1, "Millis")
+    ]
+    
+    # Add bars for each metric, host, and parameter
+    for subplot_idx, (metric_idx, metric_name) in enumerate(metrics):
+        row = subplot_idx + 1
+        axes_updated = False
         
-        # Get available hosts in order
-        available_hosts = [h for h in hosts if any(h in variant_data[v] for v in variant_data)]
-        
-        # Create color map for hosts
-        host_colors = plt.cm.get_cmap('tab10', max(len(available_hosts), 1))
-        host_color_map = {host: host_colors(i) for i, host in enumerate(available_hosts)}
-        
-        # Create bar positions
-        x = np.arange(len(unique_variants_ordered))
-        bar_width = 0.8 / max(1, len(available_hosts))
-        
-        # Plot on each axis
-        for axis, metric_name in zip(axes, ("Watts", "Millis", "Joules")):
-            metric_index = {"Watts": 0, "Millis": 1, "Joules": 2}[metric_name]
+        for param_idx, param_label in enumerate(param_labels):
+            variant_data, unique_variants_ordered = all_variant_data[param_label]
             
-            for host_idx, host in enumerate(available_hosts):
-                values = []
-                for variant in unique_variants_ordered:
-                    if host in variant_data[variant]:
-                        values.append(variant_data[variant][host][metric_index])
-                    else:
-                        values.append(0)
-                
-                bar_positions = x + host_idx * bar_width - (len(available_hosts) - 1) * bar_width / 2
-                bars = axis.bar(bar_positions, values, bar_width, label=host, color=host_color_map[host], alpha=0.8)
-                
-                # Add value labels on bars
-                for bar in bars:
-                    height = bar.get_height()
-                    if height > 0:
-                        axis.annotate(f'{height:.2f}',
-                                      xy=(bar.get_x() + bar.get_width() / 2, height),
-                                      xytext=(0, 3),
-                                      textcoords="offset points",
-                                      ha='center', va='bottom', fontsize=8)
+            # Update axes on first parameter (all parameters share same x-axis)
+            if not axes_updated:
+                fig.update_yaxes(title_text=metric_name, row=row, col=1)
+                fig.update_xaxes(title_text="Variant", row=row, col=1)
+                axes_updated = True
             
-            axis.set_ylabel(metric_name)
-            axis.set_title(f"{metric_name} by Host")
-            axis.grid(axis='y', alpha=0.3)
-        
-        # Set x-axis labels to variant names
-        axes[-1].set_xticks(x)
-        axes[-1].set_xticklabels(unique_variants_ordered, rotation=45, ha='right')
-        axes[-1].set_xlabel('Variant')
-        
-        # Add legend for hosts
-        axes[0].legend(title='Host', bbox_to_anchor=(1.02, 1), loc='upper left')
-        
-        fig.suptitle('Energy Metrics by Host\nSelected Parameters: ' + 
-                     ', '.join(get_param_label(p) for p in selected_params[:3]) + 
-                     ('...' if len(selected_params) > 3 else ''))
-        fig.tight_layout(rect=[0, 0, 1, 0.96])
-        fig.canvas.draw_idle()
+            for host in available_hosts:
+                values = [variant_data[variant].get(host, (0, 0, 0))[metric_idx] for variant in unique_variants_ordered]
+                
+                fig.add_trace(
+                    go.Bar(
+                        name=f"{host} ({param_label})",
+                        x=unique_variants_ordered,
+                        y=values,
+                        marker_color=host_color_map[host],
+                        showlegend=(subplot_idx == 0),
+                        text=[f'{v:.2f}' for v in values],
+                        textposition='inside',
+                        textangle=0,
+                        hovertemplate=f'<b>{host}</b> [{param_label}]<br>Variant: %{{x}}<br>{metric_name}: %{{y:.2f}}<extra></extra>',
+                        legendgroup=param_label,
+                        visible=(param_idx == 0),
+                        meta={'param_idx': param_idx}
+                    ),
+                    row=row, col=1
+                )
     
-    # Get all parameter combinations
-    all_params = tuple(product(*params))
-    selected_params = [all_params[0]]
+    # Update layout - use legend for parameter selection
+    fig.update_layout(
+        title_text=f'Energy Metrics by Host',
+        barmode='group',
+        height=1200,
+        bargap=0.3,  # Increase gap between different variants
+        bargroupgap=0.1,  # Small gap between hosts within same variant
+        hovermode='closest',
+        showlegend=True,
+        legend=dict(
+            title=f'Host (Parameter) - Click to toggle',
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=1.02
+        )
+    )
     
-    # Create figure with three subplots for Watts, Millis and Joules
-    fig, axes = plt.subplots(3, 1, figsize=(14, 12), sharex=True)
-    plt.subplots_adjust(left=0.07, right=0.88, top=0.92, bottom=0.15, hspace=0.4)
-    
-    # Create RadioButtons for parameter selection
-    ax_radio = plt.axes([0.90, 0.15, 0.08, 0.25])
-    radio = RadioButtons(ax_radio, tuple(get_param_label(p) for p in all_params), active=0)
-    
-    def radio_clicked(label):
-        """Handle RadioButton click"""
-        # Find the parameter tuple corresponding to the label
-        for param_tuple in all_params:
-            if get_param_label(param_tuple) == label:
-                selected_params[0] = param_tuple
-                break
-        update_plot(selected_params)
-    
-    radio.on_clicked(radio_clicked)
-    
-    # Initial plot
-    update_plot(selected_params)
-    
-    plt.show()
+    # Export to HTML
+    output_file = "energy_metrics.html"
+    fig.write_html(output_file)
+    print(f"  Generated plot: {job}/{output_file}")
     
     # Go back to parent directory for next job
     os.chdir("..")
