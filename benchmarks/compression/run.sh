@@ -61,7 +61,7 @@ for VARIANT in $VARIANTS; do
   echo "variant $VARIANT"
   echo "  warmup"
   activation=`wsk -i action invoke "compression/$VARIANT" \
-      -p ipv4 "$IPV4" \
+      -p ipv4 "${IPV4LIST[0]}" \
       -p file "$MIN_FILE" \
       -p cid "$HOSTNAME-$VARIANT-warmup" \
     | cut -d ' ' -f 6`

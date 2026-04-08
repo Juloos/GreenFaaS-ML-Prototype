@@ -61,7 +61,7 @@ for SCHEMA in $SCHEMAS; do
   echo "schema $SCHEMA"
   echo "  warmup"
   activation=`wsk -i action invoke "demo/$SCHEMA" \
-      -p ipv4 "$IPV4" \
+      -p ipv4 "${IPV4LIST[0]}" \
       -p schema "$SCHEMA" \
       -p text "$MIN_TEXT" \
       -p ttsid "$HOSTNAME-$SCHEMA-warmup" \
