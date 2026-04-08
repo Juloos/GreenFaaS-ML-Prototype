@@ -155,7 +155,6 @@ for job in JOBS:
                         textangle=0,
                         hovertemplate=f'<b>{host}</b> [{param_label}]<br>Variant: %{{x}}<br>{metric_name}: %{{y:.2f}}<extra></extra>',
                         legendgroup=param_label,
-                        visible=(param_idx == 0),
                         meta={'param_idx': param_idx}
                     ),
                     row=row, col=1
@@ -167,7 +166,7 @@ for job in JOBS:
         barmode='group',
         height=1200,
         bargap=0.3,  # Increase gap between different variants
-        bargroupgap=0.1,  # Small gap between hosts within same variant
+        bargroupgap=0.05,  # Small gap between hosts within same variant
         hovermode='closest',
         showlegend=True,
         legend=dict(
