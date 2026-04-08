@@ -23,7 +23,7 @@ def parse_data(filename: str) -> tuple[float, float, float]:  # returns (watts, 
     return host_watts, (end - start).total_seconds() * 1000, host_watts / len(data)
 
 
-JOBS = tuple(host.removesuffix('/') for host in glob.glob("*/") if "ignore" not in host)
+JOBS = tuple(host.removesuffix('/') for host in glob.glob("*/") if "ignore" not in host and "__pycache__" not in host)
 
 for job in JOBS:
     print(f"Processing job: {job}")
@@ -59,7 +59,7 @@ for job in JOBS:
     print("    Joules:", joules)
 
 
-    # === INTERACTIVE PLOTTING SECTION ===
+    # === INTERACTIVE PLOTTING SECTION [AI-based] ===
     
     def get_param_label(param_tuple):
         """Convert parameter tuple to readable label"""
