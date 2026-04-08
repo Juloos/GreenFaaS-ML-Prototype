@@ -12,10 +12,10 @@ git pull
 
 
 echo "Generating benchmark files..."
-head -c 4M </dev/urandom >$(dirname "$SCRIPTPATH")/storage_objects/4Mo.bin; echo "  4Mo.bin"
-head -c 64M </dev/urandom >$(dirname "$SCRIPTPATH")/storage_objects/64Mo.bin; echo "  64Mo.bin"
-head -c 1024M </dev/urandom >$(dirname "$SCRIPTPATH")/storage_objects/1024Mo.bin; echo "  1024Mo.bin"
-head -c 4G </dev/urandom >$(dirname "$SCRIPTPATH")/storage_objects/4Go.bin; echo "  4Go.bin"
+{ head -c 4M </dev/urandom >$(dirname "$SCRIPTPATH")/storage_objects/4Mo.bin; echo "  4Mo.bin"; } &
+{ head -c 64M </dev/urandom >$(dirname "$SCRIPTPATH")/storage_objects/64Mo.bin; echo "  64Mo.bin"; } &
+{ head -c 1024M </dev/urandom >$(dirname "$SCRIPTPATH")/storage_objects/1024Mo.bin; echo "  1024Mo.bin"; } &
+{ head -c 4G </dev/urandom >$(dirname "$SCRIPTPATH")/storage_objects/4Go.bin; echo "  4Go.bin"; } &
 
 
 source benchmarks/_common/init_swift.sh
