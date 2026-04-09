@@ -5,7 +5,6 @@ import shutil
 
 
 class BrotliFile:
-    """Custom file-like interface for brotli streaming compression."""
     def __init__(self, filename, mode, quality=11):
         global zipper  # Assumes zipper is brotli
         self.filename = filename
@@ -17,23 +16,17 @@ class BrotliFile:
         return self
     
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
-        return False
-    
-    def write(self, data):
-        """Compress and write data incrementally."""
-        compressed = self.compressor.process(data)
-        if compressed:
-            self.file.write(compressed)
-    
-    def close(self):
-        """Flush remaining compressed data."""
         if not self.file.closed:
-            # Finish compression
             compressed = self.compressor.finish()
             if compressed:
                 self.file.write(compressed)
             self.file.close()
+        return False
+    
+    def write(self, data):
+        compressed = self.compressor.process(data)
+        if compressed:
+            self.file.write(compressed)
 
 
 def pull(obj, ipv4):
@@ -94,7 +87,11 @@ def main(args):
         case _:
             zipper = importlib.import_module(f"compression.{algo}")
     maxLevelArg = {
-        "zstd": lambda: {"level": zipper.CompressionParameter.compression_level.bounds()[1]},
+        "zstd": lambda: {"options": {
+            zipper.CompressionParameter.window_log: 26,
+            zipper.CompressionParameter.strategy: zipper.CompressionParameter.strategy.bounds()[-1],
+            zipper.CompressionParameter.compression_level: zipper.CompressionParameter.compression_level.bounds()[1]
+        }},
         "lzma": lambda: {"preset": zipper.PRESET_EXTREME},
         "gzip": lambda: {"compresslevel": 9},
         "bz2": lambda: {"compresslevel": 9},
@@ -109,10 +106,7 @@ def main(args):
     process_begin = datetime.datetime.now()
     with open(file, 'rb') as f:
         with (BrotliFile if algo == 'brotli' else zipper.open)(cid, 'wb', **maxLevelArg) as fz:
-            while True:
-                chunk = f.read(64*1024**2)  # 64MB
-                if not chunk:
-                    break
+            while (chunk := f.read(64*1024**2)):  # 64MB
                 fz.write(chunk)
     process_end = datetime.datetime.now()
 
