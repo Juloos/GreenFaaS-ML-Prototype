@@ -91,7 +91,7 @@ def main(args):
         "zstd": lambda: {"options": {
             zipper.CompressionParameter.window_log: 26,
             zipper.CompressionParameter.strategy: zipper.CompressionParameter.strategy.bounds()[-1],
-            zipper.CompressionParameter.compression_level: zipper.CompressionParameter.compression_level.bounds()[1]
+            zipper.CompressionParameter.compression_level: 20
         }},
         "lzma": lambda: {"preset": zipper.PRESET_EXTREME},
         "gzip": lambda: {"compresslevel": 9},
