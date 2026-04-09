@@ -54,16 +54,19 @@ def main(args):
     cid = args.get("cid", "zip.cid.not.given")
     algo = args.get("algo", "zip.algo.not.given")
 
-    if algo in ("lz4", "brotli"):
-        zipper = importlib.import_module(algo)
-    else:
-        zipper = importlib.import_module(f"compression.{algo}")
+    match algo:
+        case "lz4":
+            zipper = importlib.import_module("lz4.frame")
+        case "brotli":
+            zipper = importlib.import_module("brotli")
+        case _:
+            zipper = importlib.import_module(f"compression.{algo}")
     maxLevelArg = {
         "zstd": lambda: {"level": zipper.CompressionParameter.compression_level.bounds()[1]},
         "lzma": lambda: {"preset": zipper.PRESET_EXTREME},
         "gzip": lambda: {"compresslevel": 9},
         "bz2": lambda: {"compresslevel": 9},
-        "lz4": lambda: {"compressionlevel": zipper.COMPRESSIONLEVEL_MAX},
+        "lz4": lambda: {"compressionlevel": zipper.COMPRESSIONLEVEL_MAX, "block_size": zipper.BLOCKSIZE_MAX1MB},
         "brotli": lambda: {"quality": zipper.MAX_QUALITY}
     }[algo]()
 
@@ -75,7 +78,7 @@ def main(args):
     with open(file, 'rb') as f:
         with zipper.open(cid, 'wb', **maxLevelArg) as fz:
             while True:
-                chunk = f.read(1024**2)
+                chunk = f.read(1024**2)  # 1MB
                 if not chunk:
                     break
                 fz.write(chunk)
