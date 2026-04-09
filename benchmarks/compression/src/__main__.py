@@ -79,6 +79,7 @@ def main(args):
     cid = args.get("cid", "zip.cid.not.given")
     algo = args.get("algo", "zip.algo.not.given")
 
+    global zipper
     match algo:
         case "lz4":
             zipper = importlib.import_module("lz4.frame")
