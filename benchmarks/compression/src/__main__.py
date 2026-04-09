@@ -4,6 +4,38 @@ import os
 import shutil
 
 
+class BrotliFile:
+    """Custom file-like interface for brotli streaming compression."""
+    def __init__(self, filename, mode, quality=11):
+        global zipper  # Assumes zipper is brotli
+        self.filename = filename
+        self.mode = mode
+        self.compressor = zipper.Compressor(quality=quality)
+        self.file = open(filename, 'wb')
+        
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+        return False
+    
+    def write(self, data):
+        """Compress and write data incrementally."""
+        compressed = self.compressor.process(data)
+        if compressed:
+            self.file.write(compressed)
+    
+    def close(self):
+        """Flush remaining compressed data."""
+        if not self.file.closed:
+            # Finish compression
+            compressed = self.compressor.finish()
+            if compressed:
+                self.file.write(compressed)
+            self.file.close()
+
+
 def pull(obj, ipv4):
   
     # Swift identifiant
@@ -66,7 +98,7 @@ def main(args):
         "lzma": lambda: {"preset": zipper.PRESET_EXTREME},
         "gzip": lambda: {"compresslevel": 9},
         "bz2": lambda: {"compresslevel": 9},
-        "lz4": lambda: {"compression_level": zipper.COMPRESSIONLEVEL_MAX, "block_size": zipper.BLOCKSIZE_MAX64MB},
+        "lz4": lambda: {"compression_level": zipper.COMPRESSIONLEVEL_MAX, "block_size": zipper.BLOCKSIZE_MAX4MB},
         "brotli": lambda: {"quality": 11}
     }[algo]()
 
@@ -76,7 +108,7 @@ def main(args):
     
     process_begin = datetime.datetime.now()
     with open(file, 'rb') as f:
-        with zipper.open(cid, 'wb', **maxLevelArg) as fz:
+        with (BrotliFile if algo == 'brotli' else zipper.open)(cid, 'wb', **maxLevelArg) as fz:
             while True:
                 chunk = f.read(64*1024**2)  # 64MB
                 if not chunk:
