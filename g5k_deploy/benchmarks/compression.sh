@@ -33,7 +33,8 @@ BENCHARGS=("${@:5:$#}")
 
 echo "Initializing the Swift hosts..."
 for HOST in "${SWIFT_HOSTS[@]}"; do
-  ssh $SSHFLAGS root@$HOST ./greenfaas/benchmarks/compression/init_swift.sh |& sed "s/^/  $HOST: /" &
+  HHOSTNAME="$(cut -d '.' -f 1 <<<"$HOST")"
+  ssh $SSHFLAGS root@$HOST ./greenfaas/benchmarks/compression/init_swift.sh |& sed "s/^/  $HHOSTNAME: /" &
 done
 wait
 
