@@ -16,6 +16,7 @@ echo "Generating benchmark files..."
 { head -c 64M </dev/urandom >$(dirname "$SCRIPTPATH")/storage_objects/64Mo.bin; echo "  64Mo.bin"; } &
 { head -c 1024M </dev/urandom >$(dirname "$SCRIPTPATH")/storage_objects/1024Mo.bin; echo "  1024Mo.bin"; } &
 { head -c 4G </dev/urandom >$(dirname "$SCRIPTPATH")/storage_objects/4Go.bin; echo "  4Go.bin"; } &
+wait
 
 
 source benchmarks/_common/init_swift.sh
