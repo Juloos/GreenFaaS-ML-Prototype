@@ -17,8 +17,8 @@ whisk:
     actions:
       time:
         min: "100ms"
-        max: "10m"
-        std: "10m"
+        max: "30m"
+        std: "30m"
   versions:
     openwhisk:
       buildDate: "2022-06-23-06:18:00Z"
