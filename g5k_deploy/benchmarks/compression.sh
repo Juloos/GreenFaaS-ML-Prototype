@@ -33,9 +33,9 @@ BENCHARGS=("${@:5:$#}")
 
 echo "Initializing the Swift hosts..."
 for HOST in "${SWIFT_HOSTS[@]}"; do
-  echo "  on $HOST"
-  ssh $SSHFLAGS root@$HOST ./greenfaas/benchmarks/compression/init_swift.sh |& sed "s/^/    /"
+  ssh $SSHFLAGS root@$HOST ./greenfaas/benchmarks/compression/init_swift.sh |& sed "s/^/  $HOST: /" &
 done
+wait
 
 echo "Deploying the benchmark..."
 for HOST in "${OW_HOSTS[@]}"; do
