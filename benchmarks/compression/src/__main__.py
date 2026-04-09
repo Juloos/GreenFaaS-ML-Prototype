@@ -66,8 +66,8 @@ def main(args):
         "lzma": lambda: {"preset": zipper.PRESET_EXTREME},
         "gzip": lambda: {"compresslevel": 9},
         "bz2": lambda: {"compresslevel": 9},
-        "lz4": lambda: {"compressionlevel": zipper.COMPRESSIONLEVEL_MAX, "block_size": zipper.BLOCKSIZE_MAX1MB},
-        "brotli": lambda: {"quality": zipper.MAX_QUALITY}
+        "lz4": lambda: {"compression_level": zipper.COMPRESSIONLEVEL_MAX, "block_size": zipper.BLOCKSIZE_MAX64MB},
+        "brotli": lambda: {"quality": 11}
     }[algo]()
 
     pull_begin = datetime.datetime.now()
@@ -78,7 +78,7 @@ def main(args):
     with open(file, 'rb') as f:
         with zipper.open(cid, 'wb', **maxLevelArg) as fz:
             while True:
-                chunk = f.read(1024**2)  # 1MB
+                chunk = f.read(64*1024**2)  # 64MB
                 if not chunk:
                     break
                 fz.write(chunk)
