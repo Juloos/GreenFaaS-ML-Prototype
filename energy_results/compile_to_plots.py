@@ -2,6 +2,7 @@ import os
 import json
 import datetime
 import glob
+import re
 from itertools import product
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -65,7 +66,8 @@ for job in JOBS:
         """Convert parameter tuple to readable label"""
         return " | ".join(str(p) for p in param_tuple)
     
-    # Collect data for all parameter combinations
+    # Collect idle data once per host, and benchmark variant data per parameter combination
+    idle_data = {host: (watts[host]["idle"], millis[host]["idle"], joules[host]["idle"]) for host in hosts}
     all_variant_data = {}
     for param in product(*params):
         param_label = get_param_label(param)
@@ -73,12 +75,6 @@ for job in JOBS:
         unique_variants_ordered = []
         
         for host in hosts:
-            # Always include idle for each host
-            if "idle" not in variant_data:
-                variant_data["idle"] = {}
-                unique_variants_ordered.append("idle")
-            variant_data["idle"][host] = (watts[host]["idle"], millis[host]["idle"], joules[host]["idle"])
-            
             # Include benchmark variants for this parameter
             for var in variants:
                 if var == "idle":
@@ -97,8 +93,22 @@ for job in JOBS:
         os.chdir("..")
         continue
     
-    # Sort parameters by label for consistent ordering
-    param_labels = tuple(sorted(all_variant_data.keys()))
+    def natural_sort_key(label: str):
+        parts = re.split(r'(\d+)', label)
+        return [int(part) if part.isdigit() else part.lower() for part in parts]
+    
+    # Sort parameters by label using natural numeric ordering for embedded values
+    param_labels = tuple(sorted(all_variant_data.keys(), key=natural_sort_key))
+    
+    # Build a complete ordered list of all variants across parameters
+    all_variant_categories = []
+    for _, unique_variants_ordered in all_variant_data.values():
+        for variant in unique_variants_ordered:
+            if variant not in all_variant_categories:
+                all_variant_categories.append(variant)
+    variant_positions = {variant: idx for idx, variant in enumerate(all_variant_categories)}
+    x_min = -0.5
+    x_max = len(all_variant_categories) - 0.5 if all_variant_categories else 0.5
     
     # Get available hosts in order
     available_hosts = []
@@ -112,11 +122,21 @@ for job in JOBS:
     host_colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
     host_color_map = {host: host_colors[i % len(host_colors)] for i, host in enumerate(available_hosts)}
     
+    def darken_color(hex_color: str, factor: float = 0.75) -> str:
+        hex_color = hex_color.lstrip('#')
+        r = int(hex_color[0:2], 16)
+        g = int(hex_color[2:4], 16)
+        b = int(hex_color[4:6], 16)
+        r = max(0, min(255, int(r * factor)))
+        g = max(0, min(255, int(g * factor)))
+        b = max(0, min(255, int(b * factor)))
+        return f"#{r:02x}{g:02x}{b:02x}"
+    
     # Create subplots
     fig = make_subplots(
         rows=3, cols=1,
         subplot_titles=("Joules by Host", "Watts by Host", "Millis by Host"),
-        vertical_spacing=0.08
+        vertical_spacing=0.05
     )
     
     # Metrics to plot
@@ -137,40 +157,67 @@ for job in JOBS:
             # Update axes on first parameter (all parameters share same x-axis)
             if not axes_updated:
                 fig.update_yaxes(title_text=metric_name, row=row, col=1)
-                fig.update_xaxes(title_text="Variant", row=row, col=1)
+                fig.update_xaxes(
+                    title_text="Variant" if subplot_idx == len(metrics) - 1 else "",
+                    row=row,
+                    col=1,
+                    tickmode='array',
+                    tickvals=list(variant_positions.values()),
+                    ticktext=list(variant_positions.keys())
+                )
                 axes_updated = True
             
             for host in available_hosts:
                 values = [variant_data[variant].get(host, (0, 0, 0))[metric_idx] for variant in unique_variants_ordered]
+                x_values = [variant_positions[variant] for variant in unique_variants_ordered]
                 
                 fig.add_trace(
                     go.Bar(
                         name=f"{host} ({param_label})",
-                        x=unique_variants_ordered,
+                        x=x_values,
                         y=values,
                         marker_color=host_color_map[host],
                         showlegend=(subplot_idx == 0),
-                        text=[f'{v:.2f}' for v in values],
+                        text=[f"{v:.2f}" for v in values],
                         textposition='inside',
                         textangle=0,
-                        hovertemplate=f'<b>{host}</b> [{param_label}]<br>Variant: %{{x}}<br>{metric_name}: %{{y:.2f}}<extra></extra>',
+                        hovertemplate=f"<b>{host}</b> [{param_label}]<br>Variant: %{{customdata}}<br>{metric_name}: %{{y:.2f}}<extra></extra>",
                         legendgroup=param_label,
-                        meta={'param_idx': param_idx}
+                        customdata=unique_variants_ordered,
+                        meta={"param_idx": param_idx}
+                    ),
+                    row=row, col=1
+                )
+        
+        # Add single idle horizontal line per host only for Joules
+        if metric_name == "Joules":
+            for host in available_hosts:
+                idle_value = idle_data[host][metric_idx]
+                fig.add_trace(
+                    go.Scatter(
+                        name=f"{host} idle {metric_name}: {idle_value:.2f}",
+                        x=[x_min, x_max],
+                        y=[idle_value, idle_value],
+                        mode="lines",
+                        line={"color": darken_color(host_color_map[host]), "dash": "dash"},
+                        showlegend=True,
+                        legendgroup=f"idle-{host}",
+                        meta={"idle": True}
                     ),
                     row=row, col=1
                 )
     
     # Update layout - use legend for parameter selection
     fig.update_layout(
-        title_text=f'Energy Metrics by Host',
-        barmode='group',
+        title_text=f"Energy Metrics by Host",
+        barmode="group",
         height=1200,
         bargap=0.3,  # Increase gap between different variants
         bargroupgap=0.05,  # Small gap between hosts within same variant
         hovermode='closest',
         showlegend=True,
         legend=dict(
-            title=f'Host (Parameter) - Click to toggle',
+            title=f"Host (Parameter) - Click to toggle",
             yanchor="top",
             y=0.99,
             xanchor="left",

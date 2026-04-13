@@ -1,4 +1,4 @@
-decision_tree/__pycache__/
+**/__pycache__/
 **/*.log
 energy_results/*.csv
 energy_results/*.png

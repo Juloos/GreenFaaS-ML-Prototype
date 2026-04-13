@@ -55,6 +55,11 @@ for (( i = 1 ; i <= $# ; i++ )); do
 done
 STRBENCHARGS=$(printf '"%s" ' "${BENCHARGS[@]}")
 
+if [[ -z "$BENCH" ]]; then
+  echo "Error: no benchmark specified"
+  exit 1
+fi
+
 if [[ "$NIGHT_OR_DAY" == "auto" ]]; then
   h=$(cut -d ':' -f 1 <<<"$WT:0:0")
   m=$(cut -d ':' -f 2 <<<"$WT:0:0")

@@ -15,7 +15,7 @@ class BrotliFile:
     def __enter__(self):
         return self
     
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, *_):
         if not self.file.closed:
             compressed = self.compressor.finish()
             if compressed:
