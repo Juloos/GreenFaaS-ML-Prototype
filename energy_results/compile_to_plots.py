@@ -94,8 +94,12 @@ for job in JOBS:
         continue
     
     def natural_sort_key(label: str):
-        parts = re.split(r'(\d+)', label)
-        return [int(part) if part.isdigit() else part.lower() for part in parts]
+        parts = re.split(r'(\d+[GMK]?)', label)
+        return [
+            int(part.replace('G', '000M').replace('M', '000K').replace('K', '000'))
+            if part.isdigit() or (part and part[:-1].isdigit()) else part.lower()
+            for part in parts
+        ]
     
     # Sort parameters by label using natural numeric ordering for embedded values
     param_labels = tuple(sorted(all_variant_data.keys(), key=natural_sort_key))
@@ -110,13 +114,14 @@ for job in JOBS:
     x_min = -0.5
     x_max = len(all_variant_categories) - 0.5 if all_variant_categories else 0.5
     
-    # Get available hosts in order
+    # Get available hosts in sorted order
     available_hosts = []
     for variant_data, _ in all_variant_data.values():
         for host in hosts:
             if any(host in variant_data[v] for v in variant_data):
                 if host not in available_hosts:
                     available_hosts.append(host)
+    available_hosts.sort(key=natural_sort_key)
     
     # Define host colors
     host_colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
@@ -184,7 +189,7 @@ for job in JOBS:
                         hovertemplate=f"<b>{host}</b> [{param_label}]<br>Variant: %{{customdata}}<br>{metric_name}: %{{y:.2f}}<extra></extra>",
                         legendgroup=param_label,
                         customdata=unique_variants_ordered,
-                        meta={"param_idx": param_idx}
+                        meta={"host": host, "param_idx": param_idx}
                     ),
                     row=row, col=1
                 )
@@ -201,13 +206,13 @@ for job in JOBS:
                         mode="lines",
                         line={"color": darken_color(host_color_map[host]), "dash": "dash"},
                         showlegend=True,
-                        legendgroup=f"idle-{host}",
-                        meta={"idle": True}
+                        legendgroup=host,
+                        meta={"host": host, "idle": True}
                     ),
                     row=row, col=1
                 )
     
-    # Update layout - use legend for parameter selection
+    # Update layout - use legend for parameter selection and host filtering
     fig.update_layout(
         title_text=f"Energy Metrics by Host",
         barmode="group",
@@ -224,6 +229,60 @@ for job in JOBS:
             x=1.02
         )
     )
+
+    if len(available_hosts) > 1:
+        # Create host filter buttons based on trace metadata
+        host_trace_indices = {
+            host: [i for i, trace in enumerate(fig.data) if trace.meta.get("host") == host]
+            for host in available_hosts
+        }
+
+        host_buttons = [
+            dict(
+                label="All Hosts",
+                method="update",
+                args=[
+                    {"visible": [True] * len(fig.data)}
+                ]
+            )
+        ]
+
+        for host in available_hosts:
+            indices = host_trace_indices[host]
+            host_buttons.append(
+                dict(
+                    label=host,
+                    method="restyle",
+                    args=[
+                        {"visible": [False]},
+                        indices
+                    ],
+                    args2=[
+                        {"visible": [True]},
+                        indices
+                    ]
+                )
+            )
+
+        fig.update_layout(
+            updatemenus=[
+                dict(
+                    active=0,
+                    buttons=host_buttons,
+                    direction="left",
+                    type="buttons",
+                    showactive=False,
+                    x=0.5,
+                    xanchor="center",
+                    y=1.15,
+                    yanchor="top",
+                    pad={"r": 10, "t": 10},
+                    bgcolor="rgba(255,255,255,0.8)",
+                    bordercolor="#cccccc",
+                    borderwidth=1
+                )
+            ]
+        )
     
     # Export to HTML
     output_file = "energy_metrics.html"
