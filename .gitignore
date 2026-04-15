@@ -1,5 +1,6 @@
 **/__pycache__/
 **/*.log
+**/*.tar.bz2
 energy_results/*.csv
 energy_results/*.png
 energy_results/*.svg

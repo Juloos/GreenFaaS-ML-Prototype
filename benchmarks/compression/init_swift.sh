@@ -11,12 +11,11 @@ git pull
 }
 
 
-echo "Generating benchmark files..."
-{ head -c 4M </dev/urandom >$(dirname "$SCRIPTPATH")/storage_objects/4Mo.bin; echo "  4Mo.bin"; } &
-{ head -c 64M </dev/urandom >$(dirname "$SCRIPTPATH")/storage_objects/64Mo.bin; echo "  64Mo.bin"; } &
-{ head -c 1024M </dev/urandom >$(dirname "$SCRIPTPATH")/storage_objects/1024Mo.bin; echo "  1024Mo.bin"; } &
-{ head -c 4G </dev/urandom >$(dirname "$SCRIPTPATH")/storage_objects/4Go.bin; echo "  4Go.bin"; } &
-wait
+echo "Reassembling storage archive..."
+cat $(dirname "$SCRIPTPATH")/storage_archive/part-* >$(dirname "$SCRIPTPATH")/storage_archive.tar.bz2 |& sed "s/^/  /"
+
+echo "Extracting benchmark files..."
+tar -xvf $(dirname "$SCRIPTPATH")/storage_archive.tar.bz2 -C $(dirname "$SCRIPTPATH")/storage_objects |& sed "s/^/  /"
 
 
 source benchmarks/_common/init_swift.sh
