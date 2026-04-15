@@ -16,6 +16,7 @@ cat $(dirname "$SCRIPTPATH")/storage_archive/part-* >$(dirname "$SCRIPTPATH")/st
 
 echo "Extracting benchmark files..."
 tar -xvf $(dirname "$SCRIPTPATH")/storage_archive.tar.bz2 -C $(dirname "$SCRIPTPATH")/storage_objects |& sed "s/^/  /"
+rm $(dirname "$SCRIPTPATH")/storage_archive.tar.bz2
 
 
 source benchmarks/_common/init_swift.sh
