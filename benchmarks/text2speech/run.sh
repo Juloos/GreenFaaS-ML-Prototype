@@ -69,6 +69,7 @@ for SCHEMA in $SCHEMAS; do
   while ( wsk -i activation get "$activation" >/dev/null 2>&1 ; test $? -ne 0 ); do
     sleep 1s
   done
+  sleep 10s  # Let it warmup
   for TEXT in "${TEXTS[@]}"; do
     echo "  for text $TEXT"
     start=$(date +%FT%T)
@@ -82,9 +83,11 @@ for SCHEMA in $SCHEMAS; do
           -p schema "$SCHEMA" \
           -p text "$TEXT" \
           -p ttsid "$HOSTNAME-$SCHEMA-$TEXT-$i" \
-        | cut -d ' ' -f 6 >>activations
+        | cut -d ' ' -f 6 >>activations &
         IPV4I=$(( (IPV4I + 1) % ${#IPV4LIST[@]} ))
+        if (( $i % 10 == 0 )); then wait; fi
       done
+      wait
       echo "    waiting for activations to complete..."
       while [ -s activations ]; do
         for ACTIVATION in $(cat activations); do
