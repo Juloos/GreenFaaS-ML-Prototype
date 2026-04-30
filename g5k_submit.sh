@@ -55,8 +55,8 @@ for (( i = 1 ; i <= $# ; i++ )); do
 done
 STRBENCHARGS=$(printf '"%s" ' "${BENCHARGS[@]}")
 
-if [[ -z "$BENCH" ]]; then
-  echo "Error: no benchmark specified"
+if [[ ! -f "./g5k_deploy/benchmarks/$BENCH.sh" ]]; then
+  echo "Error: wrong benchmark '$BENCH'"
   exit 1
 fi
 

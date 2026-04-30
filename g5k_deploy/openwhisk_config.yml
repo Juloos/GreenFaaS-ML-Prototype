@@ -10,14 +10,14 @@ whisk:
   loadbalancer:
     blackboxFraction: "100%"
   limits:
-    actionsInvokesPerminute: 1000000000
-    actionsInvokesConcurrent: 1000000000
-    triggersFiresPerminute: 1000000000
-    actionsSequenceMaxlength: 1000000000
+    actionsInvokesPerminute: 10000
+    actionsInvokesConcurrent: 10000
+    triggersFiresPerminute: 10000
+    actionsSequenceMaxlength: 10000
     actions:
       time:
         min: "100ms"
-        max: "600m"
+        max: "120m"
         std: "30m"
   versions:
     openwhisk:
