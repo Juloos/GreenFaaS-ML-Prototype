@@ -26,5 +26,6 @@ swapoff -a
   helm install owdev openwhisk/openwhisk -n openwhisk --create-namespace -f ./openwhisk_config.yml && {
     while true; do
       kubectl get pods -n openwhisk --watch | grep --color=always -E "^owdev-install-packages-.*$|$"
+      sleep 1
     done
   }
