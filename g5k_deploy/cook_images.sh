@@ -31,7 +31,7 @@ ssh $SSHFLAGS root@$HOST <<-"EOF" |& sed "s/^/  /"
   apt upgrade -y |& sed "s/^/  /"
   apt remove -y $(dpkg --get-selections docker.io docker-compose docker-compose-v2 docker-doc podman-docker containerd runc 2>/dev/null | cut -f1) |& sed "s/^/  /"
   apt update -y |& sed "s/^/  /"
-  apt install -y ca-certificates curl moreutils python3-swiftclient |& sed "s/^/  /"
+  apt install -y ca-certificates curl moreutils |& sed "s/^/  /"
 
   echo -e "\nSetting up Docker repository"
   install -m 0755 -d /etc/apt/keyrings |& sed "s/^/  /"
@@ -54,15 +54,9 @@ EOF2
   apt clean |& sed "s/^/  /"
 
   echo -e "\nCloning the git repo"
-  git clone "https://github.com/Juloos/GreenFaaS-ML-Prototype" --branch "NoML-Energy-Monitoring" "greenfaas" |& sed "s/^/  /"
+  git clone "https://github.com/Juloos/GreenFaaS-ML-Prototype" --branch "simple-OW-deploy" "greenfaas" |& sed "s/^/  /"
   cp -r greenfaas/bin/* /usr/bin/ |& sed "s/^/  /"
 EOF
-
-
-echo -e "\nPreparing Swift environment"
-ssh $SSHFLAGS root@$HOST "docker pull openstackswift/saio" |& sed "s/^/  /"
-tgz-g5k -m $HOST -f ~/public/docker_swift_$(ssh $SSHFLAGS root@$HOST "uname -m").tar.zst |& sed "s/^/  /"
-ssh $SSHFLAGS root@$HOST "docker system prune -af" |& sed "s/^/  /"
 
 
 echo -e "\nPreparing Openwhisk environment"

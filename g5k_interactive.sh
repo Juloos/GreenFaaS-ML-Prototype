@@ -13,4 +13,18 @@ git pull
 source .sql.sh
 
 
-oarsub -t monitor=wattmetre_power_watt -t deploy -l "{$SQL_OW}/cluster=1/host=1+{$SQL_SWIFT}/host=1,walltime=1" -I
+if [ -z "$1" ]; then
+  NB_OW=1
+else
+  NB_OW=$1
+fi
+
+
+if [ -z "$2" ]; then
+  WT=1
+else
+  WT=$2
+fi
+
+
+oarsub -t deploy -l "{$SQL_OW}/cluster=1/host=$NB_OW,walltime=$WT" -I
